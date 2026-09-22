@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { WifiOff } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import Sidebar from "@/components/ui/Sidebar";
 import Topbar from "@/components/ui/Topbar";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
@@ -13,6 +14,7 @@ export default function AdminShell({
   fitScreen?: boolean;
 }) {
   const isOnline = useOnlineStatus();
+  const { t } = useTranslation("common");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
@@ -26,8 +28,8 @@ export default function AdminShell({
         </div>
         {!isOnline && (
           <div className="flex flex-none items-center justify-center gap-2 bg-status-warn px-5 py-1.5 text-center text-xs font-semibold text-white print:hidden">
-            <WifiOff className="h-3.5 w-3.5" strokeWidth={2} />
-            Offline — this demo runs on local data already, so nothing's interrupted. A real backend will need a write queue here.
+            <WifiOff className="h-3.5 w-3.5 flex-none" strokeWidth={2} />
+            {t("state.offlineNote")}
           </div>
         )}
         <main className={`flex-1 overflow-y-auto print:overflow-visible ${fitScreen ? "lg:overflow-hidden" : ""}`}>

@@ -1,0 +1,80 @@
+{
+  "language": {
+    "label": "Language",
+    "en": "English",
+    "ar": "العربية"
+  },
+  "actions": {
+    "save": "Save",
+    "saveChanges": "Save changes",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "clear": "Clear",
+    "back": "Back",
+    "close": "Close",
+    "confirm": "Confirm",
+    "print": "Print",
+    "export": "Export"
+  },
+  "state": {
+    "loading": "Loading…",
+    "online": "Online",
+    "offline": "Offline",
+    "offlineNote": "Offline — this demo runs on local data already, so nothing's interrupted. A real backend will need a write queue here."
+  },
+  "status": {
+    "open": "Open",
+    "sent": "Sent",
+    "pending": "Pending",
+    "fired": "Fired",
+    "preparing": "Preparing",
+    "ready": "Ready",
+    "served": "Served",
+    "closed": "Closed",
+    "cancelled": "Cancelled",
+    "voided": "Voided",
+    "empty": "Empty",
+    "occupied": "Occupied",
+    "needsBill": "Needs bill",
+    "draft": "Draft",
+    "ordered": "Ordered",
+    "received": "Received",
+    "sale": "Sale",
+    "purchase": "Purchase",
+    "waste": "Waste",
+    "adjustment": "Adjustment"
+  },
+  "role": {
+    "owner": "Owner",
+    "manager": "Manager",
+    "cashier": "Cashier",
+    "kitchen": "Kitchen"
+  },
+  "badge": {
+    "new": "New",
+    "popular": "Popular",
+    "deal": "Deal"
+  },
+  "paymentMethod": {
+    "cash": "Cash",
+    "card": "Card",
+    "other": "Other"
+  },
+  "weekday": {
+    "sun": "Sun",
+    "mon": "Mon",
+    "tue": "Tue",
+    "wed": "Wed",
+    "thu": "Thu",
+    "fri": "Fri",
+    "sat": "Sat"
+  },
+  "time": {
+    "daily": "Daily",
+    "am": "AM",
+    "pm": "PM"
+  }
+}

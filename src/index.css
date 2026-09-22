@@ -132,6 +132,18 @@ input[type="number"] {
   animation: slide-in-right var(--transition-base) ease-out;
 }
 
+/* Mirrors the animation above for RTL: it enters from the inline-end, which is
+   the opposite physical side once dir="rtl" is set. Only the keyframes swap, so
+   duration/easing stay in sync with the utility. */
+@keyframes slide-in-inline-end {
+  from { opacity: 0; transform: translateX(-16px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+:root[dir="rtl"] .animate-slide-in-right {
+  animation-name: slide-in-inline-end;
+}
+
 @keyframes slide-up {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
@@ -205,4 +217,26 @@ input[type="number"] {
 .scrollbar-warm {
   scrollbar-color: var(--color-border-strong) transparent;
   scrollbar-width: thin;
+}
+
+/* ── Arabic / RTL typography ──────────────────────────────────────
+   Arabic script is cursive, so letter-spacing visually pulls the letter joins
+   apart. The ~45 `tracking-*` usages across the app are neutralised here rather
+   than edited one by one. `text-transform: uppercase` is deliberately left
+   alone — it is a no-op for Arabic glyphs and still meaningful for Latin text.
+
+   dir/lang on <html> are set by src/lib/i18n/config.ts. */
+
+:root[lang="ar"] body {
+  font-family: "Segoe UI", Tahoma, "Noto Sans Arabic", "Noto Naskh Arabic", Arial, system-ui, sans-serif;
+  /* The font-feature-settings declared on body above are Inter stylistic sets —
+     meaningless for an Arabic face. */
+  font-feature-settings: normal;
+  letter-spacing: normal;
+}
+
+:root[lang="ar"] *,
+:root[lang="ar"] *::before,
+:root[lang="ar"] *::after {
+  letter-spacing: normal !important;
 }

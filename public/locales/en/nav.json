@@ -1,0 +1,43 @@
+{
+  "brand": "Smoke & Char",
+  "sections": {
+    "dashboard": "Dashboard",
+    "pos": "Point of Sale",
+    "kds": "Kitchen Display",
+    "menu": "Menu",
+    "tables": "Floor plan",
+    "inventory": "Inventory",
+    "staff": "Staff",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "groups": {
+    "operations": "Operations",
+    "overview": "Overview",
+    "menu": "Menu",
+    "inventory": "Inventory",
+    "management": "Management"
+  },
+  "items": {
+    "tables": "Tables",
+    "kitchen": "Kitchen",
+    "dashboard": "Dashboard",
+    "menu": "Menu",
+    "categories": "Categories",
+    "deals": "Deals",
+    "stock": "Stock",
+    "recipes": "Recipes",
+    "purchases": "Purchases",
+    "suppliers": "Suppliers",
+    "staff": "Staff",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "aria": {
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar",
+    "logOut": "Log out"
+  }
+}

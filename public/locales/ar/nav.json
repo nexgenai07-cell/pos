@@ -1,0 +1,43 @@
+{
+  "brand": "Smoke & Char",
+  "sections": {
+    "dashboard": "لوحة التحكم",
+    "pos": "نقاط البيع",
+    "kds": "شاشة المطبخ",
+    "menu": "القائمة",
+    "tables": "مخطط الصالة",
+    "inventory": "المخزون",
+    "staff": "الموظفون",
+    "reports": "التقارير",
+    "settings": "الإعدادات"
+  },
+  "groups": {
+    "operations": "العمليات",
+    "overview": "نظرة عامة",
+    "menu": "القائمة",
+    "inventory": "المخزون",
+    "management": "الإدارة"
+  },
+  "items": {
+    "tables": "الطاولات",
+    "kitchen": "المطبخ",
+    "dashboard": "لوحة التحكم",
+    "menu": "القائمة",
+    "categories": "الفئات",
+    "deals": "العروض",
+    "stock": "المخزون",
+    "recipes": "الوصفات",
+    "purchases": "المشتريات",
+    "suppliers": "الموردون",
+    "staff": "الموظفون",
+    "reports": "التقارير",
+    "settings": "الإعدادات"
+  },
+  "aria": {
+    "openMenu": "فتح القائمة",
+    "closeMenu": "إغلاق القائمة",
+    "expandSidebar": "توسيع الشريط الجانبي",
+    "collapseSidebar": "طي الشريط الجانبي",
+    "logOut": "تسجيل الخروج"
+  }
+}

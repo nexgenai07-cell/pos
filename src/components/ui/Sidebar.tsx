@@ -21,45 +21,65 @@ import {
   ChevronRight,
   X,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/context/AuthContext";
 import { getBranch } from "@/lib/api/branch";
 import { canAccessArea, type Area } from "@/lib/rbac";
+import { useLocale } from "@/lib/i18n/useLocale";
+import { roleLabel } from "@/lib/i18n/labels";
 import StatusPill from "@/components/ui/StatusPill";
 
 const COLLAPSE_KEY = "smoke-and-char-sidebar-collapsed";
 
+/** Translation keys available under the "nav" namespace's `items` group. */
+type NavKey =
+  | "items.tables"
+  | "items.kitchen"
+  | "items.dashboard"
+  | "items.menu"
+  | "items.categories"
+  | "items.deals"
+  | "items.stock"
+  | "items.recipes"
+  | "items.purchases"
+  | "items.suppliers"
+  | "items.staff"
+  | "items.reports"
+  | "items.settings";
+
 interface NavItem {
   to: string;
-  label: string;
+  /** Translation key inside the "nav" namespace — never a display string. */
+  key: NavKey;
   icon: LucideIcon;
   /** Restricts this link to roles that can access the area — see src/lib/rbac.ts. */
   area?: Area;
 }
 
 const OPERATIONS: NavItem[] = [
-  { to: "/pos", label: "Tables", icon: LayoutGrid, area: "pos" },
-  { to: "/kds", label: "Kitchen", icon: ChefHat, area: "kds" },
+  { to: "/pos", key: "items.tables", icon: LayoutGrid, area: "pos" },
+  { to: "/kds", key: "items.kitchen", icon: ChefHat, area: "kds" },
 ];
 
-const OVERVIEW: NavItem[] = [{ to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard }];
+const OVERVIEW: NavItem[] = [{ to: "/admin/dashboard", key: "items.dashboard", icon: LayoutDashboard }];
 
 const MENU: NavItem[] = [
-  { to: "/admin/menu", label: "Menu", icon: UtensilsCrossed },
-  { to: "/admin/menu/categories", label: "Categories", icon: Tags },
-  { to: "/admin/menu/deals", label: "Deals", icon: Percent },
+  { to: "/admin/menu", key: "items.menu", icon: UtensilsCrossed },
+  { to: "/admin/menu/categories", key: "items.categories", icon: Tags },
+  { to: "/admin/menu/deals", key: "items.deals", icon: Percent },
 ];
 
 const INVENTORY: NavItem[] = [
-  { to: "/admin/inventory/stock", label: "Stock", icon: Boxes },
-  { to: "/admin/inventory/recipes", label: "Recipes", icon: ClipboardList },
-  { to: "/admin/inventory/purchases", label: "Purchases", icon: Truck },
-  { to: "/admin/inventory/suppliers", label: "Suppliers", icon: Building2 },
+  { to: "/admin/inventory/stock", key: "items.stock", icon: Boxes },
+  { to: "/admin/inventory/recipes", key: "items.recipes", icon: ClipboardList },
+  { to: "/admin/inventory/purchases", key: "items.purchases", icon: Truck },
+  { to: "/admin/inventory/suppliers", key: "items.suppliers", icon: Building2 },
 ];
 
 const MANAGEMENT: NavItem[] = [
-  { to: "/admin/staff", label: "Staff", icon: Users },
-  { to: "/admin/reports", label: "Reports", icon: BarChart3 },
-  { to: "/admin/settings", label: "Settings", icon: Settings },
+  { to: "/admin/staff", key: "items.staff", icon: Users },
+  { to: "/admin/reports", key: "items.reports", icon: BarChart3 },
+  { to: "/admin/settings", key: "items.settings", icon: Settings },
 ];
 
 function initials(name: string): string {
@@ -81,6 +101,9 @@ export default function Sidebar({
 }) {
   const { staff, logout } = useAuth();
   const location = useLocation();
+  const { t } = useTranslation("nav");
+  const { t: tCommon } = useTranslation("common");
+  const { isRtl } = useLocale();
   const canSeeAdmin = staff?.role === "manager" || staff?.role === "owner";
   const operations = OPERATIONS.filter((item) => !item.area || canAccessArea(staff?.role, item.area));
 
@@ -111,6 +134,14 @@ export default function Sidebar({
     return to === "/pos" || to === "/admin/menu" ? location.pathname === to : location.pathname.startsWith(to);
   }
 
+  // Tailwind's translate utilities are physical, so the off-canvas panel has to
+  // slide toward whichever edge it's anchored to (see start-0 below).
+  const closedOffset = isRtl ? "translate-x-full" : "-translate-x-full";
+  // The panel sits on the inline-start edge, so collapse/expand chevrons point
+  // the opposite way in RTL.
+  const CollapseIcon = isRtl ? ChevronRight : ChevronLeft;
+  const ExpandIcon = isRtl ? ChevronLeft : ChevronRight;
+
   return (
     <>
       {mobileOpen && (
@@ -122,8 +153,8 @@ export default function Sidebar({
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-40 flex h-full flex-none flex-col border-r border-border bg-surface-raised shadow-sm transition-transform duration-200 md:relative md:z-auto md:translate-x-0 md:transition-[width] ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
+        className={`fixed inset-y-0 start-0 z-40 flex h-full flex-none flex-col border-e border-border bg-surface-raised shadow-sm transition-transform duration-200 md:relative md:z-auto md:translate-x-0 md:transition-[width] ${
+          mobileOpen ? "translate-x-0" : closedOffset
         } ${collapsed ? "md:w-17" : "md:w-64"} w-64`}
       >
         <div className={`flex items-center justify-between gap-2 px-4 py-4 ${collapsed ? "md:justify-center md:px-2" : ""}`}>
@@ -138,7 +169,7 @@ export default function Sidebar({
           </div>
           <button
             onClick={onCloseMobile}
-            aria-label="Close menu"
+            aria-label={t("aria.closeMenu")}
             className="flex-none rounded-md p-1.5 text-ink-soft hover:bg-surface hover:text-ink md:hidden"
           >
             <X className="h-4 w-4" strokeWidth={2} />
@@ -147,7 +178,7 @@ export default function Sidebar({
 
         <nav className="flex-1 overflow-y-auto px-3 py-2">
           <NavGroup
-            label={collapsed ? undefined : "Operations"}
+            label={collapsed ? undefined : t("groups.operations")}
             items={operations}
             isActive={isActive}
             collapsed={collapsed}
@@ -156,28 +187,28 @@ export default function Sidebar({
           {canSeeAdmin && (
             <>
               <NavGroup
-                label={collapsed ? undefined : "Overview"}
+                label={collapsed ? undefined : t("groups.overview")}
                 items={OVERVIEW}
                 isActive={isActive}
                 collapsed={collapsed}
                 onNavigate={onCloseMobile}
               />
               <NavGroup
-                label={collapsed ? undefined : "Menu"}
+                label={collapsed ? undefined : t("groups.menu")}
                 items={MENU}
                 isActive={isActive}
                 collapsed={collapsed}
                 onNavigate={onCloseMobile}
               />
               <NavGroup
-                label={collapsed ? undefined : "Inventory"}
+                label={collapsed ? undefined : t("groups.inventory")}
                 items={INVENTORY}
                 isActive={isActive}
                 collapsed={collapsed}
                 onNavigate={onCloseMobile}
               />
               <NavGroup
-                label={collapsed ? undefined : "Management"}
+                label={collapsed ? undefined : t("groups.management")}
                 items={MANAGEMENT}
                 isActive={isActive}
                 collapsed={collapsed}
@@ -195,12 +226,12 @@ export default function Sidebar({
               </div>
               <div className={`min-w-0 flex-1 ${collapsed ? "md:hidden" : ""}`}>
                 <p className="truncate text-sm font-medium text-ink">{staff.name}</p>
-                <StatusPill label={staff.role} tone="accent" />
+                <StatusPill label={roleLabel(tCommon, staff.role)} tone="accent" />
               </div>
               <button
                 onClick={logout}
-                aria-label="Log out"
-                title="Log out"
+                aria-label={t("aria.logOut")}
+                title={t("aria.logOut")}
                 className="flex-none rounded-md p-1.5 text-ink-soft transition-colors hover:bg-surface hover:text-status-danger"
               >
                 <LogOut className="h-4 w-4" strokeWidth={2} />
@@ -211,11 +242,15 @@ export default function Sidebar({
 
         <button
           onClick={() => setCollapsed((current) => !current)}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-          className="absolute -right-3 top-16 hidden h-6 w-6 items-center justify-center rounded-full border border-border bg-surface-raised text-ink-soft shadow-sm transition-colors hover:border-accent hover:text-accent md:flex"
+          aria-label={t(collapsed ? "aria.expandSidebar" : "aria.collapseSidebar")}
+          title={t(collapsed ? "aria.expandSidebar" : "aria.collapseSidebar")}
+          className="absolute -end-3 top-16 hidden h-6 w-6 items-center justify-center rounded-full border border-border bg-surface-raised text-ink-soft shadow-sm transition-colors hover:border-accent hover:text-accent md:flex"
         >
-          {collapsed ? <ChevronRight className="h-3.5 w-3.5" strokeWidth={2.5} /> : <ChevronLeft className="h-3.5 w-3.5" strokeWidth={2.5} />}
+          {collapsed ? (
+            <ExpandIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
+          ) : (
+            <CollapseIcon className="h-3.5 w-3.5" strokeWidth={2.5} />
+          )}
         </button>
       </aside>
     </>
@@ -235,13 +270,16 @@ function NavGroup({
   collapsed: boolean;
   onNavigate?: () => void;
 }) {
+  const { t } = useTranslation("nav");
+
   return (
     <div className="mb-4">
       {label && (
         <p className="mb-1.5 px-2.5 text-[11px] font-semibold uppercase tracking-wide text-ink-soft/70">{label}</p>
       )}
       <div className="space-y-0.5">
-        {items.map(({ to, label: itemLabel, icon: Icon }) => {
+        {items.map(({ to, key, icon: Icon }) => {
+          const itemLabel = t(key);
           const active = isActive(to);
           return (
             <Link

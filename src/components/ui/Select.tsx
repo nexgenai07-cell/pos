@@ -11,13 +11,15 @@ const Select = forwardRef<HTMLSelectElement, SelectProps>(function Select(
     <div className="relative">
       <select
         ref={ref}
-        className={`w-full appearance-none rounded-lg border border-border bg-surface-raised px-3 py-2 pr-9 text-sm text-ink transition-colors hover:border-border-strong focus:outline-none focus:ring-2 focus:ring-accent/25 focus:border-accent disabled:cursor-not-allowed disabled:bg-surface disabled:text-ink-soft ${className}`}
+        className={`w-full appearance-none rounded-lg border border-border bg-surface-raised px-3 py-2 pe-9 text-sm text-ink transition-colors hover:border-border-strong focus:outline-none focus:ring-2 focus:ring-accent/25 focus:border-accent disabled:cursor-not-allowed disabled:bg-surface disabled:text-ink-soft ${className}`}
         {...props}
       >
         {children}
       </select>
+      {/* Logical inset/padding so the chevron sits on the trailing side in both
+          LTR and RTL — otherwise it overlaps Arabic text. */}
       <ChevronDown
-        className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft"
+        className="pointer-events-none absolute end-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-soft"
         strokeWidth={2}
       />
     </div>
