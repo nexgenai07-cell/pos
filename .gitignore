@@ -1,0 +1,19 @@
+# dependencies
+/node_modules
+
+# build
+/dist
+*.tsbuildinfo
+
+# misc
+.DS_Store
+*.local
+
+# env
+.env*
+
+# dev-only demo bridge (see hooks/useQrBridgeSync.ts) — runtime data, not real content
+public/qr-bridge.json
+
+# logs
+npm-debug.log*
