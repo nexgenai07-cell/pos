@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { Branch } from "@/types";
 import { getBranch, updateBranch } from "@/lib/api/branch";
 import { useToast } from "@/components/ui/Toast";
@@ -10,14 +11,32 @@ import FormField from "@/components/ui/FormField";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 
-const TIMEZONES = ["America/Chicago", "America/New_York", "America/Los_Angeles", "America/Denver"];
+/** IANA zones, Gulf-first since the branch operates on Asia/Riyadh. */
+const TIMEZONES = [
+  "Asia/Riyadh",
+  "Asia/Dubai",
+  "Asia/Qatar",
+  "Asia/Kuwait",
+  "Asia/Bahrain",
+  "Asia/Muscat",
+  "Africa/Cairo",
+  "Europe/London",
+  "America/New_York",
+  "America/Chicago",
+  "America/Los_Angeles",
+];
+
+/** Gulf currencies first, then common reporting currencies. Drives lib/format.ts. */
+const CURRENCIES = ["SAR", "AED", "QAR", "KWD", "BHD", "OMR", "EGP", "USD", "EUR", "GBP"];
 
 export default function SettingsPage() {
   const [branch, setBranch] = useState<Branch | null>(null);
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [timezone, setTimezone] = useState("America/Chicago");
+  const [timezone, setTimezone] = useState("Asia/Riyadh");
+  const [currency, setCurrency] = useState("SAR");
   const { showToast } = useToast();
+  const { t } = useTranslation("settings");
 
   useEffect(() => {
     getBranch().then((value) => {
@@ -25,29 +44,30 @@ export default function SettingsPage() {
       setName(value.name);
       setAddress(value.address);
       setTimezone(value.timezone);
+      setCurrency(value.currency);
     });
   }, []);
 
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
-    const updated = await updateBranch({ name, address, timezone });
+    const updated = await updateBranch({ name, address, timezone, currency });
     setBranch(updated);
-    showToast("Settings saved", "success");
+    showToast(t("saved"), "success");
   }
 
   return (
     <AdminShell>
-      <PageHeader eyebrow="Settings" title="Restaurant profile" />
+      <PageHeader eyebrow={t("eyebrow")} title={t("title")} />
 
       <Card className="max-w-md" padding="lg">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Name" htmlFor="branch-name">
+          <FormField label={t("name")} htmlFor="branch-name">
             <Input id="branch-name" value={name} onChange={(event) => setName(event.target.value)} />
           </FormField>
-          <FormField label="Address" htmlFor="branch-address">
+          <FormField label={t("address")} htmlFor="branch-address">
             <Input id="branch-address" value={address} onChange={(event) => setAddress(event.target.value)} />
           </FormField>
-          <FormField label="Timezone" htmlFor="branch-timezone">
+          <FormField label={t("timezone")} htmlFor="branch-timezone">
             <Select id="branch-timezone" value={timezone} onChange={(event) => setTimezone(event.target.value)}>
               {TIMEZONES.map((tz) => (
                 <option key={tz} value={tz}>
@@ -56,17 +76,27 @@ export default function SettingsPage() {
               ))}
             </Select>
           </FormField>
+          <FormField label={t("currency")} htmlFor="branch-currency">
+            <Select id="branch-currency" value={currency} onChange={(event) => setCurrency(event.target.value)}>
+              {CURRENCIES.map((code) => (
+                <option key={code} value={code}>
+                  {code}
+                </option>
+              ))}
+            </Select>
+          </FormField>
+
+          <p className="text-[11px] text-ink-muted">{t("appliesNote")}</p>
 
           <div className="pt-1">
-            <Button type="submit">Save changes</Button>
+            <Button type="submit">{t("save")}</Button>
           </div>
         </form>
       </Card>
 
       {branch && (
         <p className="mt-4 max-w-md text-xs text-ink-soft">
-          Branch ID <code className="rounded bg-surface px-1.5 py-0.5">{branch.id}</code> — every table, order, product, and staff
-          record in this system is already scoped to it, so adding a second location later is a data change, not a rebuild.
+          {t("branchIdNote")} <code className="rounded bg-surface px-1.5 py-0.5">{branch.id}</code>
         </p>
       )}
     </AdminShell>

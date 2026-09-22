@@ -2,6 +2,7 @@ import type enCommon from "../../../public/locales/en/common.json";
 import type enNav from "../../../public/locales/en/nav.json";
 import type enAuth from "../../../public/locales/en/auth.json";
 import type enErrors from "../../../public/locales/en/errors.json";
+import type enSettings from "../../../public/locales/en/settings.json";
 
 /**
  * Locale plumbing shared by config.ts, useLocale.ts and labels.ts.
@@ -30,7 +31,7 @@ export function isLocale(value: string | undefined | null): value is Locale {
   return typeof value === "string" && (LOCALES as readonly string[]).includes(value);
 }
 
-export const NAMESPACES = ["common", "nav", "auth", "errors"] as const;
+export const NAMESPACES = ["common", "nav", "auth", "errors", "settings"] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 
 /**
@@ -46,6 +47,7 @@ declare module "i18next" {
       nav: typeof enNav;
       auth: typeof enAuth;
       errors: typeof enErrors;
+      settings: typeof enSettings;
     };
   }
 }

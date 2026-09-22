@@ -1,0 +1,12 @@
+{
+  "eyebrow": "Settings",
+  "title": "Restaurant profile",
+  "name": "Name",
+  "address": "Address",
+  "timezone": "Timezone",
+  "currency": "Currency",
+  "save": "Save changes",
+  "saved": "Settings saved",
+  "appliesNote": "Currency and timezone apply to every price and date shown across the app.",
+  "branchIdNote": "Every table, order, product, and staff record in this system is already scoped to this branch, so adding a second location later is a data change, not a rebuild. Branch ID:"
+}

@@ -5,7 +5,8 @@ import type { Branch } from "@/types";
 // redesign. See docs/architecture-plan.md §11 ("Multi-branch").
 export const BRANCH: Branch = {
   id: "default",
-  name: "Smoke & Char — Main Street",
-  address: "123 Main Street, Springfield",
-  timezone: "America/Chicago",
+  name: "Smoke & Char — Riyadh",
+  address: "King Fahd Road, Riyadh",
+  timezone: "Asia/Riyadh",
+  currency: "SAR",
 };
