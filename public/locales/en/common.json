@@ -12,12 +12,30 @@
     "edit": "Edit",
     "create": "Create",
     "search": "Search",
+    "searchPlaceholder": "Search…",
     "clear": "Clear",
+    "clearSearch": "Clear search",
+    "clearAll": "Clear all",
+    "reset": "Reset",
     "back": "Back",
     "close": "Close",
     "confirm": "Confirm",
     "print": "Print",
-    "export": "Export"
+    "export": "Export",
+    "prev": "Prev",
+    "next": "Next",
+    "dismiss": "Dismiss"
+  },
+  "table": {
+    "rowsPerPage": "Rows per page",
+    "showing": "Showing {{start}}–{{end}} of {{total}}"
+  },
+  "filters": {
+    "label": "Filters",
+    "show": "Show filters",
+    "hide": "Hide filters",
+    "typeToFilter": "Type to filter…",
+    "removeChip": "Remove {{label}} filter"
   },
   "state": {
     "loading": "Loading…",

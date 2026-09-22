@@ -1,4 +1,5 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { CheckCircle2, AlertCircle, Info, X } from "lucide-react";
 
 type ToastTone = "success" | "error" | "info";
@@ -30,6 +31,7 @@ const TONE_CLASSES: Record<ToastTone, string> = {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(0);
+  const { t } = useTranslation("common");
 
   const showToast = useCallback((message: string, tone: ToastTone = "success") => {
     const id = nextId.current++;
@@ -58,7 +60,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <span>{toast.message}</span>
               <button
                 onClick={() => dismiss(toast.id)}
-                aria-label="Dismiss"
+                aria-label={t("actions.dismiss")}
                 className="ms-1 flex-none text-ink-soft transition-colors hover:text-ink"
               >
                 <X className="h-3.5 w-3.5" strokeWidth={2} />

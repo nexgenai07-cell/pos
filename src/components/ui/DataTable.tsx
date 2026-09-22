@@ -6,6 +6,7 @@ import EmptyState from "@/components/ui/EmptyState";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
 import { useLocale } from "@/lib/i18n/useLocale";
+import { useTranslation } from "react-i18next";
 
 export interface DataTableColumn<T> {
   /** Unique column id. Also used to remember which column is sorted. */
@@ -85,6 +86,7 @@ export default function DataTable<T>({
   // Locale-aware collation: Arabic sort order differs from English, and the
   // memo re-runs when the user switches language.
   const { locale } = useLocale();
+  const { t } = useTranslation("common");
 
   const sortedData = useMemo(() => {
     if (!data) return [];
@@ -206,7 +208,7 @@ export default function DataTable<T>({
       {data !== null && data.length > 0 && (
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-2.5 text-xs text-ink-soft">
           <div className="flex items-center gap-2">
-            <span>Rows per page</span>
+            <span>{t("table.rowsPerPage")}</span>
             <Select
               value={pageSize}
               onChange={(event) => handlePageSizeChange(Number(event.target.value))}
@@ -219,18 +221,18 @@ export default function DataTable<T>({
               ))}
             </Select>
             <span>
-              Showing {start}–{end} of {sortedData.length}
+              {t("table.showing", { start, end, total: sortedData.length })}
             </span>
           </div>
           <div className="flex items-center gap-2">
             <Button variant="secondary" size="sm" onClick={() => setPage(safePage - 1)} disabled={safePage <= 1}>
-              Prev
+              {t("actions.prev")}
             </Button>
             <span className="px-1 font-medium text-ink">
               {safePage} / {totalPages}
             </span>
             <Button variant="secondary" size="sm" onClick={() => setPage(safePage + 1)} disabled={safePage >= totalPages}>
-              Next
+              {t("actions.next")}
             </Button>
           </div>
         </div>

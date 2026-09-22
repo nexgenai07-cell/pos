@@ -12,12 +12,30 @@
     "edit": "تعديل",
     "create": "إضافة",
     "search": "بحث",
+    "searchPlaceholder": "بحث…",
     "clear": "مسح",
+    "clearSearch": "مسح البحث",
+    "clearAll": "مسح الكل",
+    "reset": "إعادة تعيين",
     "back": "رجوع",
     "close": "إغلاق",
     "confirm": "تأكيد",
     "print": "طباعة",
-    "export": "تصدير"
+    "export": "تصدير",
+    "prev": "السابق",
+    "next": "التالي",
+    "dismiss": "إغلاق"
+  },
+  "table": {
+    "rowsPerPage": "صفوف لكل صفحة",
+    "showing": "عرض {{start}}–{{end}} من {{total}}"
+  },
+  "filters": {
+    "label": "عوامل التصفية",
+    "show": "إظهار عوامل التصفية",
+    "hide": "إخفاء عوامل التصفية",
+    "typeToFilter": "اكتب للتصفية…",
+    "removeChip": "إزالة عامل التصفية {{label}}"
   },
   "state": {
     "loading": "جارٍ التحميل…",

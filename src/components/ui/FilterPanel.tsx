@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import { Filter, RotateCcw, Search, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 /**
  * Expandable filter UI — deliberately NOT a modal. The panel renders in
  * normal document flow directly below the page header and animates open
@@ -44,20 +45,22 @@ export function FilterToggleButton({
   open,
   onToggle,
   activeCount = 0,
-  label = "Filters",
+  label,
 }: {
   open: boolean;
   onToggle: () => void;
   activeCount?: number;
   label?: string;
 }) {
+  const { t } = useTranslation("common");
+  const text = label ?? t("filters.label");
   return (
     <button
       type="button"
       onClick={onToggle}
       aria-expanded={open}
       aria-controls="filter-panel"
-      title={open ? "Hide filters" : "Show filters"}
+      title={open ? t("filters.hide") : t("filters.show")}
       className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-2 text-sm font-semibold transition-all ${
         open || activeCount > 0
           ? "border-accent/40 bg-accent-soft text-accent-strong"
@@ -65,7 +68,7 @@ export function FilterToggleButton({
       }`}
     >
       <Filter className="h-4 w-4" strokeWidth={2} />
-      {label}
+      {text}
       {activeCount > 0 && (
         <span className="ms-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-ember-gradient px-1.5 text-[10px] font-bold text-white">
           {activeCount}
@@ -77,7 +80,7 @@ export function FilterToggleButton({
 
 export function FilterPanel({
   open,
-  title = "Filters",
+  title,
   onReset,
   children,
   className = "",
@@ -89,6 +92,8 @@ export function FilterPanel({
   children: ReactNode;
   className?: string;
 }) {
+  const { t } = useTranslation("common");
+  const heading = title ?? t("filters.label");
   return (
     <div className={`filter-panel ${className}`} data-open={open} aria-hidden={!open} inert={!open}>
       <div>
@@ -96,7 +101,7 @@ export function FilterPanel({
           <div className="mb-3 flex items-center justify-between gap-3">
             <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
               <Filter className="h-3.5 w-3.5 text-accent" strokeWidth={2.25} />
-              {title}
+              {heading}
             </p>
             {onReset && (
               <button
@@ -105,7 +110,7 @@ export function FilterPanel({
                 className="inline-flex items-center gap-1 text-xs font-semibold text-ink-soft transition-colors hover:text-accent-strong"
               >
                 <RotateCcw className="h-3 w-3" strokeWidth={2.5} />
-                Reset
+                {t("actions.reset")}
               </button>
             )}
           </div>
@@ -145,7 +150,7 @@ export function FilterField({
 export function FilterTextInput({
   value,
   onChange,
-  placeholder = "Type to filter…",
+  placeholder,
   id,
 }: {
   value: string;
@@ -153,6 +158,7 @@ export function FilterTextInput({
   placeholder?: string;
   id?: string;
 }) {
+  const { t } = useTranslation("common");
   return (
     <div className="relative">
       <Search className="pointer-events-none absolute start-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-soft" strokeWidth={2} />
@@ -160,14 +166,14 @@ export function FilterTextInput({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        placeholder={placeholder}
+        placeholder={placeholder ?? t("filters.typeToFilter")}
         className="w-full rounded-lg border border-border bg-surface-raised py-2 ps-9 pe-8 text-sm text-ink placeholder:text-ink-soft/60 transition-colors hover:border-border-strong focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
       />
       {value && (
         <button
           type="button"
           onClick={() => onChange("")}
-          aria-label="Clear"
+          aria-label={t("actions.clear")}
           className="absolute end-2.5 top-1/2 -translate-y-1/2 text-ink-soft transition-colors hover:text-ink"
         >
           <X className="h-3.5 w-3.5" strokeWidth={2} />
@@ -192,6 +198,8 @@ export function FilterChips({
   onRemove: (key: string) => void;
   onClear: () => void;
 }) {
+  const { t } = useTranslation("common");
+
   if (chips.length === 0) return null;
 
   return (
@@ -205,7 +213,7 @@ export function FilterChips({
           <button
             type="button"
             onClick={() => onRemove(chip.key)}
-            aria-label={`Remove ${chip.label} filter`}
+            aria-label={t("filters.removeChip", { label: chip.label })}
             className="text-accent-strong/70 transition-colors hover:text-accent-strong"
           >
             <X className="h-3 w-3" strokeWidth={2.5} />
@@ -217,7 +225,7 @@ export function FilterChips({
         onClick={onClear}
         className="ms-1 text-xs font-semibold text-ink-soft transition-colors hover:text-status-danger"
       >
-        Clear all
+        {t("actions.clearAll")}
       </button>
     </div>
   );
