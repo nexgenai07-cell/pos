@@ -120,7 +120,7 @@ export default function RecipeEditorPage() {
           Cancel
         </Button>
         {hasRecipe && (
-          <Button variant="danger" onClick={handleClear} loading={clearing} className="ml-auto">
+          <Button variant="danger" onClick={handleClear} loading={clearing} className="ms-auto">
             <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
             Clear recipe
           </Button>

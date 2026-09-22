@@ -138,13 +138,13 @@ export default function OrderBuilderPage() {
               <EmptyState icon={UtensilsCrossed} title="No items match" description="Try a different category or search term." />
             </div>
           ) : (
-            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:min-h-0 lg:flex-1 lg:auto-rows-min lg:overflow-y-auto lg:pb-1 lg:pr-1">
+            <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:min-h-0 lg:flex-1 lg:auto-rows-min lg:overflow-y-auto lg:pb-1 lg:pe-1">
               {filteredProducts.map((product) => (
                 <button
                   key={product.id}
                   onClick={() => handleAdd(product)}
                   disabled={!product.isAvailable}
-                  className="group flex flex-col overflow-hidden rounded-lg border border-border bg-surface-raised text-left shadow-sm transition-all hover:border-accent hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+                  className="group flex flex-col overflow-hidden rounded-lg border border-border bg-surface-raised text-start shadow-sm transition-all hover:border-accent hover:shadow-md active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
                 >
                   <div className="relative h-24 w-full flex-none overflow-hidden bg-surface">
                     <img
@@ -156,7 +156,7 @@ export default function OrderBuilderPage() {
                       }}
                     />
                     {product.badge && (
-                      <span className="absolute left-1.5 top-1.5 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
+                      <span className="absolute start-1.5 top-1.5 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
                         {product.badge}
                       </span>
                     )}

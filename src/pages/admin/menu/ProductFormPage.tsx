@@ -332,7 +332,7 @@ export default function ProductFormPage() {
               Cancel
             </Button>
             {isEdit && (
-              <p className="ml-auto text-xs text-ink-soft">
+              <p className="ms-auto text-xs text-ink-soft">
                 Recipe &amp; stock deductions are managed under Inventory → Recipes.
               </p>
             )}

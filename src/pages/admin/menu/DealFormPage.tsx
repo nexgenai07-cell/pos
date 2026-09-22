@@ -177,7 +177,7 @@ export default function DealFormPage() {
               Cancel
             </Button>
             {isEdit && (
-              <Button type="button" variant="danger" className="ml-auto" onClick={handleDelete} loading={deleting}>
+              <Button type="button" variant="danger" className="ms-auto" onClick={handleDelete} loading={deleting}>
                 <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
                 Remove deal
               </Button>

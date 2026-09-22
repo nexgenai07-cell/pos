@@ -110,7 +110,7 @@ export default function PaymentPage() {
       <PageHeader eyebrow="Point of sale" title={`Payment — ${table?.label ?? "Table"}`} />
 
       <div className="grid gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_420px] lg:overflow-hidden">
-        <section className="space-y-4 lg:min-h-0 lg:overflow-y-auto lg:pr-1">
+        <section className="space-y-4 lg:min-h-0 lg:overflow-y-auto lg:pe-1">
           <Card>
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">Order items</p>
             {order.items.map((item) => (

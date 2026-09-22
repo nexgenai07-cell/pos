@@ -405,7 +405,7 @@ export default function DashboardPage() {
               className="flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover"
             >
               Full sales report
-              <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
+              <ArrowRight className="h-3 w-3 rtl:rotate-180" strokeWidth={2.5} />
             </Link>
           }
         >
@@ -442,7 +442,7 @@ export default function DashboardPage() {
               className="flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover"
             >
               Product performance
-              <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
+              <ArrowRight className="h-3 w-3 rtl:rotate-180" strokeWidth={2.5} />
             </Link>
           </div>
           {(current?.topProducts.length ?? 0) === 0 ? (
@@ -490,7 +490,7 @@ export default function DashboardPage() {
             <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Low stock watchlist</p>
             <Link to="/admin/inventory/stock" className="flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover">
               Restock
-              <ArrowRight className="h-3 w-3" strokeWidth={2.5} />
+              <ArrowRight className="h-3 w-3 rtl:rotate-180" strokeWidth={2.5} />
             </Link>
           </div>
           {lowStock.length === 0 ? (

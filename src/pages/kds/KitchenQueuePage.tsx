@@ -60,7 +60,7 @@ export default function KitchenQueuePage() {
         }
       />
 
-      <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+      <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pe-1">
         {tickets === null ? (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 3 }).map((_, index) => (
@@ -94,8 +94,8 @@ export default function KitchenQueuePage() {
                         {active.map((item) => (
                           <div
                             key={item.id}
-                            className={`rounded-lg border-l-4 bg-surface py-2 pl-3 pr-2 ${
-                              item.status === "fired" ? "border-l-status-warn" : "border-l-accent"
+                            className={`rounded-lg border-s-4 bg-surface py-2 ps-3 pe-2 ${
+                              item.status === "fired" ? "border-s-status-warn" : "border-s-accent"
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2">
@@ -152,7 +152,7 @@ function ItemGroup({
               <span>
                 {item.quantity}× {item.nameSnapshot}
               </span>
-              {item.notes && <span className="ml-1 italic">— {item.notes}</span>}
+              {item.notes && <span className="ms-1 italic">— {item.notes}</span>}
             </div>
           </div>
         ))}

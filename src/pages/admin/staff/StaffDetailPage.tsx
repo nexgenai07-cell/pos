@@ -110,7 +110,7 @@ export default function StaffDetailPage() {
               Clock in
             </Button>
           )}
-          <div className="ml-auto flex items-center gap-1.5">
+          <div className="ms-auto flex items-center gap-1.5">
             <Link to={`/admin/staff/${staffId}/edit`}>
               <Button variant="secondary" size="sm">
                 <Pencil className="h-3.5 w-3.5" strokeWidth={2} />

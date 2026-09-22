@@ -21,7 +21,7 @@ export function BarRow({ label, value, max, valueLabel }: { label: string; value
       <div className="h-3 flex-1 rounded-full bg-surface-sunken">
         <div className="h-3 rounded-full bg-ember-gradient" style={{ width: `${pct}%` }} />
       </div>
-      <span className="w-16 flex-none text-right text-xs tabular-nums text-ink">{valueLabel}</span>
+      <span className="w-16 flex-none text-end text-xs tabular-nums text-ink">{valueLabel}</span>
     </div>
   );
 }

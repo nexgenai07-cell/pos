@@ -18,7 +18,7 @@ export function Table({ children, className = "" }: { children: ReactNode; class
 
 export function THead({ children }: { children: ReactNode }) {
   return (
-    <thead className="bg-accent-soft text-left text-xs font-semibold uppercase tracking-wide text-accent-strong">
+    <thead className="bg-accent-soft text-start text-xs font-semibold uppercase tracking-wide text-accent-strong">
       <tr className="border-b-2 border-accent/20">{children}</tr>
     </thead>
   );
@@ -30,7 +30,9 @@ export function Th({
   className = "",
   ...props
 }: ThHTMLAttributes<HTMLTableCellElement> & { align?: "left" | "right" | "center" }) {
-  const alignClass = align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left";
+  // "right"/"left" are logical here — trailing/leading edge — so numeric columns
+  // stay trailing-aligned when the UI flips to Arabic.
+  const alignClass = align === "right" ? "text-end" : align === "center" ? "text-center" : "text-start";
   return (
     <th className={`px-4 py-3 ${alignClass} ${className}`} {...props}>
       {children}
@@ -71,7 +73,7 @@ export function Td({
   className = "",
   ...props
 }: TdHTMLAttributes<HTMLTableCellElement> & { align?: "left" | "right" | "center" }) {
-  const alignClass = align === "right" ? "text-right" : align === "center" ? "text-center" : "";
+  const alignClass = align === "right" ? "text-end" : align === "center" ? "text-center" : "";
   return (
     <td className={`px-4 py-3 ${alignClass} ${className}`} {...props}>
       {children}

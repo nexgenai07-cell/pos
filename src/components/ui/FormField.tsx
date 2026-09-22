@@ -19,7 +19,7 @@ export default function FormField({
     <div>
       <label htmlFor={htmlFor} className="mb-1.5 block text-xs font-semibold uppercase tracking-wide text-ink-soft">
         {label}
-        {required && <span className="ml-0.5 text-status-danger">*</span>}
+        {required && <span className="ms-0.5 text-status-danger">*</span>}
       </label>
       {children}
       {error ? (

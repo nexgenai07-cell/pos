@@ -71,7 +71,7 @@ export default function TableMapPage() {
         }
       />
 
-      <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pr-1">
+      <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:pe-1">
         {tables === null ? (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
             {Array.from({ length: 8 }).map((_, index) => (
@@ -90,7 +90,7 @@ export default function TableMapPage() {
               <button
                 key={table.id}
                 onClick={() => handleTableClick(table)}
-                className="flex min-h-24 flex-col items-start justify-center gap-2.5 rounded-xl border border-border bg-surface-raised p-5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-md active:scale-[0.98] active:shadow-sm"
+                className="flex min-h-24 flex-col items-start justify-center gap-2.5 rounded-xl border border-border bg-surface-raised p-5 text-start shadow-sm transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-md active:scale-[0.98] active:shadow-sm"
               >
                 <span className="text-lg font-semibold text-ink">{table.label}</span>
                 <StatusPill label={STATUS_LABEL[table.status]} tone={STATUS_TONE[table.status]} />

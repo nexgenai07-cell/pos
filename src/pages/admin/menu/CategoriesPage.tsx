@@ -161,7 +161,7 @@ export default function CategoriesPage() {
             min="0"
             value={editDraft.sortOrder}
             onChange={(event) => setEditDraft((current) => ({ ...current, sortOrder: event.target.value }))}
-            className="w-16 py-1! text-right"
+            className="w-16 py-1! text-end"
           />
         ) : (
           <span className="tabular-nums text-ink-soft">{row.sortOrder}</span>

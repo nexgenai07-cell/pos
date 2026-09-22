@@ -40,7 +40,9 @@ interface DataTableProps<T> {
 type SortState = { key: string; direction: "asc" | "desc" } | null;
 
 function alignClass(align?: "left" | "right" | "center") {
-  return align === "right" ? "text-right" : align === "center" ? "text-center" : "text-left";
+  // Logical edges, not physical: "right" means trailing, so price/quantity
+  // columns stay trailing-aligned when the direction flips to RTL.
+  return align === "right" ? "text-end" : align === "center" ? "text-center" : "text-start";
 }
 
 export function DataTableThumbnail({ src, alt, size = 36 }: { src: string; alt: string; size?: number }) {
@@ -123,7 +125,7 @@ export default function DataTable<T>({
     <div className="overflow-hidden rounded-xl border border-border bg-surface-raised shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-accent-soft text-left text-xs font-semibold uppercase tracking-wide text-accent-strong">
+          <thead className="bg-accent-soft text-start text-xs font-semibold uppercase tracking-wide text-accent-strong">
             <tr className="border-b-2 border-accent/20">
               {columns.map((column) => {
                 const isSorted = sort?.key === column.key;
@@ -204,7 +206,7 @@ export default function DataTable<T>({
             <Select
               value={pageSize}
               onChange={(event) => handlePageSizeChange(Number(event.target.value))}
-              className="w-auto py-1! pr-7! text-xs"
+              className="w-auto py-1! pe-7! text-xs"
             >
               {pageSizeOptions.map((size) => (
                 <option key={size} value={size}>
