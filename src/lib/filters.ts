@@ -1,7 +1,17 @@
+import i18n, { currentLocale } from "@/lib/i18n/config";
+import { formatDate } from "@/lib/format";
+
 /**
- * Small, dependency-free helpers shared by every admin filter panel.
- * Pure functions only — no React, so they're reusable from the dashboard,
- * list pages and reports alike.
+ * Small helpers shared by every admin filter panel.
+ * No React, so they're reusable from the dashboard, list pages and reports alike.
+ *
+ * Sorting and the range summary are locale-aware: Arabic collation differs from
+ * English, and "Last 7 days" needs Arabic plural forms. Both read the active
+ * locale instead of assuming the browser default.
+ *
+ * Note: these helpers resolve translations internally rather than taking a `t`
+ * argument (unlike the enum->label maps in lib/i18n/labels.ts), because callers
+ * embed their output inside larger strings.
  */
 
 export function matchesSearch(value: string | null | undefined, query: string): boolean {
@@ -28,8 +38,9 @@ export function isoDateOffset(daysAgo: number): string {
 }
 
 export function uniqueSorted(values: (string | null | undefined)[]): string[] {
+  const locale = currentLocale();
   return [...new Set(values.filter((value): value is string => Boolean(value)))].sort((a, b) =>
-    a.localeCompare(b)
+    a.localeCompare(b, locale)
   );
 }
 
@@ -45,11 +56,12 @@ export function countActiveFilters(filters: Record<string, string | boolean | nu
 export type SortDirection = "asc" | "desc";
 
 export function sortBy<T>(rows: T[], accessor: (row: T) => string | number, direction: SortDirection = "asc"): T[] {
+  const locale = currentLocale();
   const sorted = [...rows].sort((a, b) => {
     const av = accessor(a);
     const bv = accessor(b);
     if (typeof av === "number" && typeof bv === "number") return av - bv;
-    return String(av).localeCompare(String(bv), undefined, { numeric: true });
+    return String(av).localeCompare(String(bv), locale, { numeric: true });
   });
   return direction === "desc" ? sorted.reverse() : sorted;
 }
@@ -66,9 +78,14 @@ export const RANGE_PRESETS = [7, 14, 30, 90] as const;
 /** Human summary of the active window, for the filter chips. */
 export function rangeLabel(value: RangeFilterValue): string {
   if (value.from || value.to) {
-    return `${value.from || "…"} → ${value.to || "…"}`;
+    // En-dash, not "→": arrow glyphs are not bidi-mirrored, so an arrow
+    // separator would still point rightwards in Arabic and read backwards.
+    return i18n.t("range.custom", {
+      from: value.from ? formatDate(value.from) : "…",
+      to: value.to ? formatDate(value.to) : "…",
+    });
   }
-  return `Last ${value.days} days`;
+  return i18n.t("range.lastDays", { count: value.days });
 }
 
 /** Resolves a range filter into concrete inclusive ISO bounds. */

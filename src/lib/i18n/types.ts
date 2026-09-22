@@ -31,6 +31,17 @@ export function isLocale(value: string | undefined | null): value is Locale {
   return typeof value === "string" && (LOCALES as readonly string[]).includes(value);
 }
 
+/**
+ * Locale -> BCP-47 tag for Intl. Arabic is pinned to Western digits via the
+ * -u-nu-latn Unicode extension: Intl's default for "ar" is Arabic-Indic
+ * numerals (٨٫٩٩), which regional POS software doesn't use and which slow
+ * cashiers down on a keypad. Used by lib/format.ts.
+ */
+export const INTL_TAGS: Record<Locale, string> = {
+  en: "en-US",
+  ar: "ar-u-nu-latn",
+};
+
 export const NAMESPACES = ["common", "nav", "auth", "errors", "settings"] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 

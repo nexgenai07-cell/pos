@@ -2,7 +2,7 @@ import i18n from "i18next";
 import HttpBackend from "i18next-http-backend";
 import LanguageDetector from "i18next-browser-languagedetector";
 import { initReactI18next } from "react-i18next";
-import { DEFAULT_LOCALE, LOCALES, NAMESPACES, directionFor, isLocale } from "./types";
+import { DEFAULT_LOCALE, INTL_TAGS, LOCALES, NAMESPACES, directionFor, isLocale, type Locale } from "./types";
 
 /**
  * Locale persistence — same "smoke-and-char-*" convention as AuthContext
@@ -64,5 +64,19 @@ i18n
  * emits languageChanged on init as well, which covers first paint.
  */
 i18n.on("languageChanged", applyDocumentLanguage);
+
+/**
+ * The resolved locale right now. For non-component code that can't call the
+ * useLocale() hook — lib/format.ts, lib/filters.ts, sort comparators.
+ */
+export function currentLocale(): Locale {
+  const resolved = i18n.resolvedLanguage ?? i18n.language;
+  return isLocale(resolved) ? resolved : DEFAULT_LOCALE;
+}
+
+/** BCP-47 tag for Intl formatting — Western digits in Arabic (see INTL_TAGS). */
+export function currentIntlLocale(): string {
+  return INTL_TAGS[currentLocale()];
+}
 
 export default i18n;

@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import EmptyState from "@/components/ui/EmptyState";
 import Select from "@/components/ui/Select";
 import Button from "@/components/ui/Button";
+import { useLocale } from "@/lib/i18n/useLocale";
 
 export interface DataTableColumn<T> {
   /** Unique column id. Also used to remember which column is sorted. */
@@ -81,6 +82,9 @@ export default function DataTable<T>({
   const [sort, setSort] = useState<SortState>(null);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(defaultPageSize);
+  // Locale-aware collation: Arabic sort order differs from English, and the
+  // memo re-runs when the user switches language.
+  const { locale } = useLocale();
 
   const sortedData = useMemo(() => {
     if (!data) return [];
@@ -95,10 +99,10 @@ export default function DataTable<T>({
       if (av == null) return 1;
       if (bv == null) return -1;
       if (typeof av === "number" && typeof bv === "number") return av - bv;
-      return String(av).localeCompare(String(bv), undefined, { numeric: true });
+      return String(av).localeCompare(String(bv), locale, { numeric: true });
     });
     return sort.direction === "desc" ? sorted.reverse() : sorted;
-  }, [data, sort, columns]);
+  }, [data, sort, columns, locale]);
 
   const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
   const safePage = Math.min(page, totalPages);

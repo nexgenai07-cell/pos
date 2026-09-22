@@ -73,8 +73,11 @@
     "sat": "Sat"
   },
   "time": {
-    "daily": "Daily",
-    "am": "AM",
-    "pm": "PM"
+    "daily": "Daily"
+  },
+  "range": {
+    "custom": "{{from}} – {{to}}",
+    "lastDays_one": "Last day",
+    "lastDays_other": "Last {{count}} days"
   }
 }

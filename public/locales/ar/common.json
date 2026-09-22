@@ -73,8 +73,14 @@
     "sat": "السبت"
   },
   "time": {
-    "daily": "يومياً",
-    "am": "ص",
-    "pm": "م"
+    "daily": "يومياً"
+  },
+  "range": {
+    "custom": "{{from}} – {{to}}",
+    "lastDays_one": "آخر يوم",
+    "lastDays_two": "آخر يومين",
+    "lastDays_few": "آخر {{count}} أيام",
+    "lastDays_many": "آخر {{count}} يوماً",
+    "lastDays_other": "آخر {{count}} يوم"
   }
 }
