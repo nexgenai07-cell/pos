@@ -1,0 +1,23 @@
+{
+  "eyebrow": "المطبخ",
+  "title": "قائمة الطلبات",
+  "refresh": "تحديث",
+  "empty": {
+    "title": "القائمة فارغة",
+    "description": "ستظهر هنا التذاكر المُرسلة من نقطة البيع."
+  },
+  "ageMinutes": "{{minutes}} د",
+  "tableFallback": "طاولة",
+  "start": "ابدأ",
+  "ready": "جاهز",
+  "note": "ملاحظة: {{note}}",
+  "toast": {
+    "started": "تم بدء الصنف",
+    "ready": "تم تحديد الصنف كجاهز"
+  },
+  "group": {
+    "readyServed": "جاهز / مُقدَّم",
+    "notSent": "لم يُرسل بعد",
+    "voided": "ملغى"
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "eyebrow": "Kitchen",
+  "title": "Order queue",
+  "refresh": "Refresh",
+  "empty": {
+    "title": "Queue is clear",
+    "description": "Sent orders from POS will show up here as tickets."
+  },
+  "ageMinutes": "{{minutes}}m",
+  "tableFallback": "Table",
+  "start": "Start",
+  "ready": "Ready",
+  "note": "Note: {{note}}",
+  "toast": {
+    "started": "Item started",
+    "ready": "Item marked ready"
+  },
+  "group": {
+    "readyServed": "Ready / served",
+    "notSent": "Not sent yet",
+    "voided": "Voided"
+  }
+}

@@ -3,6 +3,7 @@ import type enNav from "../../../public/locales/en/nav.json";
 import type enAuth from "../../../public/locales/en/auth.json";
 import type enErrors from "../../../public/locales/en/errors.json";
 import type enSettings from "../../../public/locales/en/settings.json";
+import type enKds from "../../../public/locales/en/kds.json";
 
 /**
  * Locale plumbing shared by config.ts, useLocale.ts and labels.ts.
@@ -42,7 +43,7 @@ export const INTL_TAGS: Record<Locale, string> = {
   ar: "ar-u-nu-latn",
 };
 
-export const NAMESPACES = ["common", "nav", "auth", "errors", "settings"] as const;
+export const NAMESPACES = ["common", "nav", "auth", "errors", "settings", "kds"] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 
 /**
@@ -59,6 +60,7 @@ declare module "i18next" {
       auth: typeof enAuth;
       errors: typeof enErrors;
       settings: typeof enSettings;
+      kds: typeof enKds;
     };
   }
 }

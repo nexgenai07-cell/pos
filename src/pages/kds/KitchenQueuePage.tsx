@@ -12,17 +12,19 @@ import Card from "@/components/ui/Card";
 import StatusPill from "@/components/ui/StatusPill";
 import EmptyState from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { useTranslation } from "react-i18next";
 
-function ticketAge(openedAt: string): { label: string; tone: "good" | "warn" | "danger" } {
+function ticketAge(openedAt: string): { minutes: number; tone: "good" | "warn" | "danger" } {
   const minutes = Math.max(0, Math.round((Date.now() - new Date(openedAt).getTime()) / 60_000));
   const tone = minutes < 10 ? "good" : minutes < 20 ? "warn" : "danger";
-  return { label: `${minutes}m`, tone };
+  return { minutes, tone };
 }
 
 export default function KitchenQueuePage() {
   const [tickets, setTickets] = useState<Order[] | null>(null);
   const [tables, setTables] = useState<Table[]>([]);
   const { showToast } = useToast();
+  const { t } = useTranslation("kds");
 
   const refresh = useCallback(() => {
     getKitchenTickets().then(setTickets);
@@ -40,22 +42,22 @@ export default function KitchenQueuePage() {
   async function handleBump(orderId: string, itemId: string, nextStatus: "preparing" | "ready") {
     await updateItemStatus(orderId, itemId, nextStatus);
     refresh();
-    showToast(nextStatus === "preparing" ? "Item started" : "Item marked ready", "success");
+    showToast(nextStatus === "preparing" ? t("toast.started") : t("toast.ready"), "success");
   }
 
   function tableLabel(order: Order) {
-    return tables.find((table) => table.id === order.tableId)?.label ?? "Table";
+    return tables.find((table) => table.id === order.tableId)?.label ?? t("tableFallback");
   }
 
   return (
     <AdminShell fitScreen>
       <PageHeader
-        eyebrow="Kitchen"
-        title="Order queue"
+        eyebrow={t("eyebrow")}
+        title={t("title")}
         actions={
           <Button variant="secondary" onClick={refresh}>
             <RefreshCw className="h-3.5 w-3.5" strokeWidth={2} />
-            Refresh
+            {t("refresh")}
           </Button>
         }
       />
@@ -68,7 +70,7 @@ export default function KitchenQueuePage() {
             ))}
           </div>
         ) : tickets.length === 0 ? (
-          <EmptyState icon={ChefHat} title="Queue is clear" description="Sent orders from POS will show up here as tickets." />
+          <EmptyState icon={ChefHat} title={t("empty.title")} description={t("empty.description")} />
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {tickets.map((order) => {
@@ -83,7 +85,7 @@ export default function KitchenQueuePage() {
                   <div className="flex items-center justify-between border-b border-border p-3.5">
                     <span className="text-sm font-semibold text-ink">{tableLabel(order)}</span>
                     <div className="flex items-center gap-1.5">
-                      <StatusPill label={age.label} tone={age.tone} />
+                      <StatusPill label={t("ageMinutes", { minutes: age.minutes })} tone={age.tone} />
                       <span className="text-xs text-ink-soft">#{order.id.slice(-6)}</span>
                     </div>
                   </div>
@@ -104,21 +106,21 @@ export default function KitchenQueuePage() {
                               </span>
                               {item.status === "fired" ? (
                                 <Button variant="secondary" onClick={() => handleBump(order.id, item.id, "preparing")}>
-                                  Start
+                                  {t("start")}
                                 </Button>
                               ) : (
-                                <Button onClick={() => handleBump(order.id, item.id, "ready")}>Ready</Button>
+                                <Button onClick={() => handleBump(order.id, item.id, "ready")}>{t("ready")}</Button>
                               )}
                             </div>
-                            {item.notes && <p className="mt-1 text-xs italic text-ink-soft">Note: {item.notes}</p>}
+                            {item.notes && <p className="mt-1 text-xs italic text-ink-soft">{t("note", { note: item.notes })}</p>}
                           </div>
                         ))}
                       </div>
                     )}
 
-                    {done.length > 0 && <ItemGroup label="Ready / served" items={done} muted="good" />}
-                    {notSent.length > 0 && <ItemGroup label="Not sent yet" items={notSent} muted="neutral" />}
-                    {voided.length > 0 && <ItemGroup label="Voided" items={voided} muted="danger" strike />}
+                    {done.length > 0 && <ItemGroup label={t("group.readyServed")} items={done} muted="good" />}
+                    {notSent.length > 0 && <ItemGroup label={t("group.notSent")} items={notSent} muted="neutral" />}
+                    {voided.length > 0 && <ItemGroup label={t("group.voided")} items={voided} muted="danger" strike />}
                   </div>
                 </Card>
               );
