@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Pencil, Trash2, Truck } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Purchase, PurchaseStatus, Supplier } from "@/types";
 import { deletePurchase, getPurchases, receivePurchase } from "@/lib/api/purchases";
 import { getSuppliers } from "@/lib/api/suppliers";
 import { on } from "@/lib/eventBus";
 import { formatDate } from "@/lib/format";
+import { purchaseStatusLabel } from "@/lib/i18n/labels";
 import { countActiveFilters, inDateRange, matchesSearch } from "@/lib/filters";
 import { errorMessage } from "@/lib/errors";
 import { useToast } from "@/components/ui/Toast";
@@ -31,7 +33,15 @@ const STATUS_TONE = { draft: "neutral", ordered: "accent", received: "good" } as
 type StatusFilter = PurchaseStatus | "all";
 type SortKey = "ordered" | "supplier" | "status";
 
+const SORT_KEY_LABEL_KEY = {
+  ordered: "purchasesPage.sortNewestFirst",
+  supplier: "purchasesPage.sortSupplier",
+  status: "purchasesPage.sortStatus",
+} as const satisfies Record<SortKey, string>;
+
 export default function PurchasesPage() {
+  const { t } = useTranslation("inventory");
+  const { t: tCommon } = useTranslation("common");
   const [purchases, setPurchases] = useState<Purchase[] | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [search, setSearch] = useState("");
@@ -56,7 +66,7 @@ export default function PurchasesPage() {
   }, [refresh]);
 
   function supplierName(id: string) {
-    return suppliers.find((supplier) => supplier.id === id)?.name ?? "Supplier";
+    return suppliers.find((supplier) => supplier.id === id)?.name ?? t("purchasesPage.fallbackSupplierName");
   }
 
   async function handleReceive(id: string) {
@@ -64,7 +74,7 @@ export default function PurchasesPage() {
     try {
       await receivePurchase(id);
       refresh();
-      showToast("Purchase order received", "success");
+      showToast(t("purchasesPage.toastReceived"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -73,12 +83,12 @@ export default function PurchasesPage() {
   }
 
   async function handleDelete(purchase: Purchase) {
-    if (!window.confirm(`Delete this purchase order from ${supplierName(purchase.supplierId)}?`)) return;
+    if (!window.confirm(t("purchasesPage.confirmDelete", { supplier: supplierName(purchase.supplierId) }))) return;
     setDeletingId(purchase.id);
     try {
       await deletePurchase(purchase.id);
       refresh();
-      showToast("Purchase order deleted", "success");
+      showToast(t("purchasesPage.toastDeleted"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -96,12 +106,15 @@ export default function PurchasesPage() {
 
   const chips: FilterChip[] = [];
   if (supplierFilter !== "all") {
-    chips.push({ key: "supplier", label: `Supplier: ${supplierName(supplierFilter)}` });
+    chips.push({ key: "supplier", label: t("purchasesPage.chipSupplier", { name: supplierName(supplierFilter) }) });
   }
-  if (statusFilter !== "all") chips.push({ key: "status", label: `Status: ${statusFilter}` });
-  if (dateFrom) chips.push({ key: "dateFrom", label: `From ${dateFrom}` });
-  if (dateTo) chips.push({ key: "dateTo", label: `To ${dateTo}` });
-  if (sortKey !== "ordered") chips.push({ key: "sort", label: `Sorted by ${sortKey}` });
+  if (statusFilter !== "all") {
+    chips.push({ key: "status", label: t("purchasesPage.chipStatus", { status: purchaseStatusLabel(tCommon, statusFilter) }) });
+  }
+  if (dateFrom) chips.push({ key: "dateFrom", label: t("purchasesPage.chipDateFrom", { date: dateFrom }) });
+  if (dateTo) chips.push({ key: "dateTo", label: t("purchasesPage.chipDateTo", { date: dateTo }) });
+  if (sortKey !== "ordered")
+    chips.push({ key: "sort", label: t("purchasesPage.chipSortedBy", { sort: t(SORT_KEY_LABEL_KEY[sortKey]) }) });
 
   function removeChip(key: string) {
     if (key === "supplier") setSupplierFilter("all");
@@ -139,32 +152,34 @@ export default function PurchasesPage() {
   const columns: DataTableColumn<Purchase>[] = [
     {
       key: "supplier",
-      header: "Supplier",
+      header: t("purchasesPage.colSupplier"),
       sortable: true,
       accessor: (purchase) => supplierName(purchase.supplierId),
       render: (purchase) => <span className="font-medium text-ink">{supplierName(purchase.supplierId)}</span>,
     },
     {
       key: "items",
-      header: "Items",
+      header: t("purchasesPage.colItems"),
       align: "right",
       sortable: true,
       accessor: (purchase) => purchase.items.length,
-      render: (purchase) => <span className="text-ink-soft">{purchase.items.length} line items</span>,
+      render: (purchase) => (
+        <span className="text-ink-soft">{t("purchasesPage.colItemsCount", { count: purchase.items.length })}</span>
+      ),
     },
     {
       key: "ordered",
-      header: "Ordered",
+      header: t("purchasesPage.colOrdered"),
       sortable: true,
       accessor: (purchase) => purchase.orderedAt,
       render: (purchase) => <span className="text-ink-soft">{formatDate(purchase.orderedAt)}</span>,
     },
     {
       key: "status",
-      header: "Status",
+      header: t("purchasesPage.colStatus"),
       sortable: true,
       accessor: (purchase) => purchase.status,
-      render: (purchase) => <StatusPill label={purchase.status} tone={STATUS_TONE[purchase.status]} />,
+      render: (purchase) => <StatusPill label={purchaseStatusLabel(tCommon, purchase.status)} tone={STATUS_TONE[purchase.status]} />,
     },
     {
       key: "actions",
@@ -174,7 +189,7 @@ export default function PurchasesPage() {
         <div className="flex items-center justify-end gap-1.5">
           {purchase.status === "ordered" && (
             <Button variant="secondary" size="sm" onClick={() => handleReceive(purchase.id)} loading={receivingId === purchase.id}>
-              Receive
+              {t("purchasesPage.receive")}
             </Button>
           )}
           {purchase.status !== "received" && (
@@ -182,12 +197,12 @@ export default function PurchasesPage() {
               <Link to={`/admin/inventory/purchases/${purchase.id}/edit`}>
                 <Button variant="secondary" size="sm">
                   <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
-                  Edit
+                  {tCommon("actions.edit")}
                 </Button>
               </Link>
               <Button variant="danger" size="sm" onClick={() => handleDelete(purchase)} loading={deletingId === purchase.id}>
                 <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-                Delete
+                {tCommon("actions.delete")}
               </Button>
             </>
           )}
@@ -199,25 +214,25 @@ export default function PurchasesPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Inventory"
-        title="Purchases"
-        description="Track ingredient orders from suppliers, from draft to received."
+        eyebrow={t("purchasesPage.eyebrow")}
+        title={t("purchasesPage.title")}
+        description={t("purchasesPage.description")}
         actions={
           <>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search supplier or PO #…" className="w-52" />
+            <SearchInput value={search} onChange={setSearch} placeholder={t("purchasesPage.searchPlaceholder")} className="w-52" />
             <FilterToggleButton open={open} onToggle={toggle} activeCount={activeCount} />
             <Link to="/admin/inventory/purchases/new">
-              <Button>New purchase order</Button>
+              <Button>{t("purchasesPage.newPurchaseOrder")}</Button>
             </Link>
           </>
         }
       />
 
-      <FilterPanel open={open} title="Filter purchase orders" onReset={activeCount > 0 ? resetFilters : undefined}>
+      <FilterPanel open={open} title={t("purchasesPage.filterTitle")} onReset={activeCount > 0 ? resetFilters : undefined}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <FilterField label="Supplier" htmlFor="po-supplier">
+          <FilterField label={t("purchasesPage.supplierLabel")} htmlFor="po-supplier">
             <Select id="po-supplier" value={supplierFilter} onChange={(event) => setSupplierFilter(event.target.value)}>
-              <option value="all">All suppliers</option>
+              <option value="all">{t("purchasesPage.allSuppliers")}</option>
               {suppliers.map((supplier) => (
                 <option key={supplier.id} value={supplier.id}>
                   {supplier.name}
@@ -226,28 +241,28 @@ export default function PurchasesPage() {
             </Select>
           </FilterField>
 
-          <FilterField label="Status" htmlFor="po-status">
+          <FilterField label={t("purchasesPage.statusLabel")} htmlFor="po-status">
             <Select id="po-status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}>
-              <option value="all">Any status</option>
-              <option value="draft">Draft</option>
-              <option value="ordered">Ordered</option>
-              <option value="received">Received</option>
+              <option value="all">{t("purchasesPage.anyStatus")}</option>
+              <option value="draft">{purchaseStatusLabel(tCommon, "draft")}</option>
+              <option value="ordered">{purchaseStatusLabel(tCommon, "ordered")}</option>
+              <option value="received">{purchaseStatusLabel(tCommon, "received")}</option>
             </Select>
           </FilterField>
 
-          <FilterField label="Ordered from" htmlFor="po-from">
+          <FilterField label={t("purchasesPage.orderedFromLabel")} htmlFor="po-from">
             <Input id="po-from" type="date" value={dateFrom} onChange={(event) => setDateFrom(event.target.value)} />
           </FilterField>
 
-          <FilterField label="Ordered to" htmlFor="po-to">
+          <FilterField label={t("purchasesPage.orderedToLabel")} htmlFor="po-to">
             <Input id="po-to" type="date" value={dateTo} onChange={(event) => setDateTo(event.target.value)} />
           </FilterField>
 
-          <FilterField label="Sort by" htmlFor="po-sort">
+          <FilterField label={t("purchasesPage.sortByLabel")} htmlFor="po-sort">
             <Select id="po-sort" value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)}>
-              <option value="ordered">Newest first</option>
-              <option value="supplier">Supplier</option>
-              <option value="status">Status</option>
+              <option value="ordered">{t("purchasesPage.sortNewestFirst")}</option>
+              <option value="supplier">{t("purchasesPage.sortSupplier")}</option>
+              <option value="status">{t("purchasesPage.sortStatus")}</option>
             </Select>
           </FilterField>
         </div>
@@ -259,17 +274,17 @@ export default function PurchasesPage() {
         data={filtered}
         keyField={(purchase) => purchase.id}
         emptyIcon={Truck}
-        emptyTitle={search || activeCount > 0 ? "No purchase orders match" : "No purchase orders yet"}
+        emptyTitle={search || activeCount > 0 ? t("purchasesPage.emptyFilteredTitle") : t("purchasesPage.emptyTitle")}
         emptyDescription={
           search || activeCount > 0
-            ? "Try a different search, widen the dates, or clear the filters."
-            : "Create a purchase order to restock ingredients."
+            ? t("purchasesPage.emptyFilteredDescription")
+            : t("purchasesPage.emptyDescription")
         }
         emptyAction={
           activeCount === 0 &&
           !search && (
             <Link to="/admin/inventory/purchases/new">
-              <Button size="sm">New purchase order</Button>
+              <Button size="sm">{t("purchasesPage.emptyActionNew")}</Button>
             </Link>
           )
         }

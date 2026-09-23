@@ -1,0 +1,260 @@
+{
+  "page": {
+    "overview": {
+      "eyebrow": "Reports",
+      "title": "Overview",
+      "description": "{{range}} across sales, orders, and stock."
+    },
+    "sales": {
+      "eyebrow": "Reports",
+      "title": "Sales",
+      "titleWithRange": "Sales — {{range}}",
+      "description": "Revenue, orders and payment mix over a date range — what came in today, this week, or any window you pick.",
+      "blurb": "Revenue by day, payment mix"
+    },
+    "productPerformance": {
+      "eyebrow": "Reports",
+      "title": "Product performance",
+      "blurb": "Best & worst sellers"
+    },
+    "margins": {
+      "eyebrow": "Reports",
+      "title": "Margins",
+      "description": "Food cost against revenue, per item — which dishes actually make money, and which are just popular.",
+      "blurb": "Food cost vs revenue"
+    },
+    "wastage": {
+      "eyebrow": "Reports",
+      "title": "Wastage",
+      "description": "What's been thrown out — by reason and by product — so waste stops being a guess.",
+      "blurb": "What's being thrown out, and its cost",
+      "recentLogHeading": "Recent waste log"
+    },
+    "peakHours": {
+      "eyebrow": "Reports",
+      "title": "Peak hours",
+      "description": "When the restaurant actually gets busy, by the hour. Tells you when to schedule extra hands.",
+      "blurb": "When orders actually happen"
+    },
+    "tableTurnover": {
+      "eyebrow": "Reports",
+      "title": "Table turnover",
+      "description": "How long tables hold orders on average — so you can spot slow tables and plan seating.",
+      "blurb": "How long tables are held"
+    },
+    "repeatCustomers": {
+      "eyebrow": "Reports",
+      "title": "Repeat customers",
+      "blurb": "Who keeps coming back",
+      "footerNote": "Only counts orders where a phone number was captured — optional on POS, required on the QR ordering flow."
+    }
+  },
+  "charts": {
+    "ordersByHour": "Orders opened, by hour of day",
+    "revenueByDay": "Revenue by day",
+    "ordersByDay": "Orders by day",
+    "avgMinutesByTable": "Average time held, per table",
+    "foodCostVsRevenue": "Food cost vs revenue, per item",
+    "revenueTrend": "Revenue trend ({{range}})",
+    "revenueTrendEmpty": "No closed orders in this window yet.",
+    "byPaymentMethod": "By payment method",
+    "topSellersByRevenue": "Top sellers by revenue",
+    "wasteCostByIngredient": "Waste cost by ingredient",
+    "ordersUnit": "{{count}} orders",
+    "minutesUnit": "{{count}} min"
+  },
+  "kpi": {
+    "deltaLabel": "vs previous period",
+    "overview": {
+      "revenue": { "title": "Revenue" },
+      "orders": { "title": "Orders" },
+      "avgOrderValue": { "title": "Avg. order value" },
+      "lowStock": { "title": "Low stock items", "sub": "Check Inventory → Stock" }
+    },
+    "sales": {
+      "revenue": {
+        "title": "Total revenue",
+        "sub": "All payments"
+      },
+      "orders": {
+        "title": "Orders",
+        "sub": "Opened in window"
+      },
+      "avgOrderValue": {
+        "title": "Avg. order value",
+        "sub": "Per order"
+      },
+      "tableTurnover": {
+        "title": "Tables served",
+        "sub": "Seated count"
+      }
+    },
+    "productPerformance": {
+      "totalRevenue": { "title": "Total revenue", "sub": "All products in window" },
+      "unitsSold": { "title": "Units sold", "sub": "Across all products" },
+      "topSeller": { "title": "Top seller", "sub": "By revenue" }
+    },
+    "margins": {
+      "revenue": {
+        "title": "Total revenue",
+        "sub": "All payments"
+      },
+      "foodCost": {
+        "title": "Food cost",
+        "sub": "Ingredients used"
+      },
+      "grossMargin": {
+        "title": "Gross margin",
+        "sub": "Revenue minus food cost"
+      }
+    },
+    "wastage": {
+      "wasteValue": {
+        "title": "Wasted value",
+        "sub": "Thrown-out ingredients"
+      },
+      "wasteOrders": {
+        "title": "Waste orders",
+        "sub": "Waste movements"
+      },
+      "wastePercent": {
+        "title": "Waste % of COGS",
+        "sub": "Waste / food cost"
+      }
+    },
+    "peakHours": {
+      "peakOrders": {
+        "title": "Peak hour orders",
+        "sub": "Busiest hour"
+      },
+      "busiestHour": {
+        "title": "Busiest hour",
+        "sub": "By orders opened"
+      },
+      "avgDailyOrders": {
+        "title": "Avg. daily orders",
+        "sub": "Orders per day"
+      }
+    },
+    "tableTurnover": {
+      "overallAvg": {
+        "title": "Overall average",
+        "sub": "open → close"
+      },
+      "tablesTracked": {
+        "title": "Tables tracked",
+        "sub": "In window"
+      }
+    },
+    "repeatCustomers": {
+      "repeatCount": { "title": "Repeat customers", "sub": "Ordered more than once" },
+      "repeatShare": { "title": "Orders from repeats", "sub": "Of orders with a phone on file" }
+    }
+  },
+  "flags": {
+    "bestSeller": "Best seller",
+    "worstSeller": "Worst seller"
+  },
+  "columns": {
+    "productPerformance": {
+      "product": "Product",
+      "category": "Category",
+      "unitsSold": "Units sold",
+      "revenue": "Revenue"
+    },
+    "margins": {
+      "product": "Product",
+      "revenue": "Revenue",
+      "cost": "Cost",
+      "margin": "Margin",
+      "marginPct": "Margin %"
+    },
+    "repeatCustomers": {
+      "phone": "Phone",
+      "visits": "Visits",
+      "totalSpend": "Total spend",
+      "lastOrder": "Last order"
+    }
+  },
+  "reportDate": {
+    "buttonLabel": "Date range",
+    "windowChip": "Window: {{window}}",
+    "filterTitle": "Filter by date",
+    "presets": {
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "thisWeek": "This week",
+      "lastWeek": "Last week",
+      "thisMonth": "This month",
+      "lastMonth": "Last month",
+      "thisYear": "This year",
+      "lastYear": "Last year",
+      "custom": "Custom range"
+    },
+    "window": {
+      "label": "Window"
+    },
+    "custom": {
+      "label": "Custom range",
+      "from": {
+        "label": "From",
+        "placeholder": "YYYY-MM-DD",
+        "hint": "Overrides the preset"
+      },
+      "to": {
+        "label": "To",
+        "placeholder": "YYYY-MM-DD"
+      }
+    }
+  },
+  "export": {
+    "csv": "Export CSV",
+    "print": "Print",
+    "downloading": "Downloading…"
+  },
+  "backToReports": "All reports",
+  "summary": {
+    "busiestHour": "Busiest hour: {{hour}} — {{count}} orders opened.",
+    "topSeller": "Top seller so far: {{name}} — {{revenue}} in revenue.",
+    "tableTurnover": {
+      "overallAvg": "Overall average: {{minutes}} min open → close.",
+      "tablesTracked": "{{count}} tables tracked in this window."
+    }
+  },
+  "empty": {
+    "noOrders": {
+      "title": "No orders in this window",
+      "description": "Widen the date window or clear the filters to see orders here."
+    },
+    "noTables": {
+      "title": "No tables in this window",
+      "description": "Widen the date window to see table data here."
+    },
+    "noProducts": {
+      "title": "No products in this window",
+      "description": "Widen the date window to see product data here."
+    },
+    "filteredBySearch": {
+      "title": "No orders match that search",
+      "description": "Clear the search to see the full recent list."
+    },
+    "noProductSales": {
+      "title": "No sales yet",
+      "description": "Closed orders will show up here as products sell."
+    },
+    "noMarginSales": {
+      "title": "No sales yet",
+      "description": "Margins are calculated from closed orders."
+    },
+    "noRepeatCustomers": {
+      "title": "No repeat customers yet",
+      "description": "Customers who order more than once will show up here."
+    }
+  },
+  "lowStock": {
+    "heading": "Low stock watchlist",
+    "empty": "Everything is above par level.",
+    "more": "+{{count}} more",
+    "viewAll": "View all"
+  }
+}

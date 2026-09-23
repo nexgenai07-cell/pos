@@ -15,7 +15,8 @@ export default function DealWindowsEditor({
   windows: DealWindow[];
   onChange: (next: DealWindow[]) => void;
 }) {
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("menu");
+  const { t: tCommon } = useTranslation("common");
   return (
     <div className="space-y-2">
       {windows.map((window, index) => (
@@ -29,7 +30,7 @@ export default function DealWindowsEditor({
           >
             {WEEKDAYS.map((day) => (
               <option key={day} value={day}>
-                {weekdayLabel(t, day)}
+                {weekdayLabel(tCommon, day)}
               </option>
             ))}
           </Select>
@@ -39,7 +40,7 @@ export default function DealWindowsEditor({
             onChange={(event) => onChange(windows.map((w, i) => (i === index ? { ...w, startTime: event.target.value } : w)))}
             className="w-auto!"
           />
-          <span className="text-xs text-ink-soft">to</span>
+          <span className="text-xs text-ink-soft">{t("dealWindows.to")}</span>
           <Input
             type="time"
             value={window.endTime}
@@ -51,7 +52,7 @@ export default function DealWindowsEditor({
             variant="danger"
             size="sm"
             onClick={() => onChange(windows.filter((_, i) => i !== index))}
-            title="Remove this window"
+            title={t("dealWindows.remove")}
           >
             <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
           </Button>
@@ -62,10 +63,15 @@ export default function DealWindowsEditor({
         type="button"
         variant="secondary"
         size="sm"
-        onClick={() => onChange([...windows, { day: todayWeekday(), startTime: "11:00", endTime: "14:00" }])}
+        onClick={() =>
+          onChange([
+            ...windows,
+            { day: todayWeekday(), startTime: t("dealWindows.seedStart"), endTime: t("dealWindows.seedEnd") },
+          ])
+        }
       >
         <Plus className="h-3.5 w-3.5" strokeWidth={2} />
-        Add day &amp; time
+        {t("dealWindows.add")}
       </Button>
     </div>
   );

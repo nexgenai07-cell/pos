@@ -1,0 +1,260 @@
+{
+  "page": {
+    "overview": {
+      "eyebrow": "التقارير",
+      "title": "نظرة عامة",
+      "description": "{{range}} عبر المبيعات والطلبات والمخزون."
+    },
+    "sales": {
+      "eyebrow": "التقارير",
+      "title": "المبيعات",
+      "titleWithRange": "المبيعات — {{range}}",
+      "description": "الإيرادات والطلبات وخلط المدفوعات خلال نطاق زمني — ما دخل اليوم أو الأسبوع أو أي نافذة تختارها.",
+      "blurb": "الإيرادات اليومية ومزيج طرق الدفع"
+    },
+    "productPerformance": {
+      "eyebrow": "التقارير",
+      "title": "أداء المنتجات",
+      "blurb": "الأكثر والأقل مبيعًا"
+    },
+    "margins": {
+      "eyebrow": "التقارير",
+      "title": "الهامش",
+      "description": "تكلفة الطعام مقابل الإيرادات، لكل عنصر — أي الأطباق تحقق ربحًا فعليًا وأيها مجرد شائع.",
+      "blurb": "تكلفة الطعام مقابل الإيرادات"
+    },
+    "wastage": {
+      "eyebrow": "التقارير",
+      "title": "الهدر",
+      "description": "ما أُلقِيَ — حسب السبب ومنتجًا — لينتهي التخمين حول الهدر.",
+      "blurb": "ما يُهدر، وتكلفته",
+      "recentLogHeading": "سجل الهدر الأخير"
+    },
+    "peakHours": {
+      "eyebrow": "التقارير",
+      "title": "ساعات الذروة",
+      "description": "متى يزداد زحام المطعم فعليًا، بالساعة. يُخبرك متى تُخطّط ليد إضافية.",
+      "blurb": "متى يزدحم المطعم فعليًا"
+    },
+    "tableTurnover": {
+      "eyebrow": "التقارير",
+      "title": "دوران الطاولات",
+      "description": "متوسط الوقت الذي تحمل فيه الطاولات الطلبات — لتعرف الطاولات البطيئة وتخطط للجلوس.",
+      "blurb": "كم من الوقت تُشغَل الطاولات"
+    },
+    "repeatCustomers": {
+      "eyebrow": "التقارير",
+      "title": "العملاء المتكررون",
+      "blurb": "من يعود باستمرار",
+      "footerNote": "يُحتسب فقط الطلبات التي سُجِّل فيها رقم هاتف — اختياري في نقطة البيع، وإلزامي في الطلب عبر رمز QR."
+    }
+  },
+  "charts": {
+    "ordersByHour": "الطلبات المفتوحة، حسب الساعة",
+    "revenueByDay": "الإيرادات اليومية",
+    "ordersByDay": "الطلبات اليومية",
+    "avgMinutesByTable": "متوسط الوقت الذي تحافظ عليه الطاولة، لكل طاولة",
+    "foodCostVsRevenue": "تكلفة الطعام مقابل الإيرادات، لكل عنصر",
+    "revenueTrend": "اتجاه الإيرادات ({{range}})",
+    "revenueTrendEmpty": "لا طلبات مغلقة في هذه النافذة بعد.",
+    "byPaymentMethod": "حسب طريقة الدفع",
+    "topSellersByRevenue": "الأكثر مبيعًا حسب الإيرادات",
+    "wasteCostByIngredient": "تكلفة الهدر حسب المكوّن",
+    "ordersUnit": "{{count}} طلب",
+    "minutesUnit": "{{count}} دقيقة"
+  },
+  "kpi": {
+    "deltaLabel": "مقارنة بالفترة السابقة",
+    "overview": {
+      "revenue": { "title": "الإيرادات" },
+      "orders": { "title": "الطلبات" },
+      "avgOrderValue": { "title": "متوسط قيمة الطلب" },
+      "lowStock": { "title": "أصناف منخفضة المخزون", "sub": "راجع المخزون ← المخزون" }
+    },
+    "sales": {
+      "revenue": {
+        "title": "إجمالي الإيرادات",
+        "sub": "كل المدفوعات"
+      },
+      "orders": {
+        "title": "الطلبات",
+        "sub": "المفتوحة في النافذة"
+      },
+      "avgOrderValue": {
+        "title": "متوسط قيمة الطلب",
+        "sub": "لكل طلب"
+      },
+      "tableTurnover": {
+        "title": "الطاولات التي خدمت",
+        "sub": "عدد الجلسات"
+      }
+    },
+    "productPerformance": {
+      "totalRevenue": { "title": "إجمالي الإيرادات", "sub": "كل المنتجات في النافذة" },
+      "unitsSold": { "title": "الوحدات المباعة", "sub": "عبر كل المنتجات" },
+      "topSeller": { "title": "الأكثر مبيعًا", "sub": "حسب الإيرادات" }
+    },
+    "margins": {
+      "revenue": {
+        "title": "إجمالي الإيرادات",
+        "sub": "كل المدفوعات"
+      },
+      "foodCost": {
+        "title": "تكلفة الطعام",
+        "sub": "المكونات المستخدمة"
+      },
+      "grossMargin": {
+        "title": "الهامش الإجمالي",
+        "sub": "الإيرادات ناقص تكلفة الطعام"
+      }
+    },
+    "wastage": {
+      "wasteValue": {
+        "title": "قيمة الهدر",
+        "sub": "المكونات المرفوعة"
+      },
+      "wasteOrders": {
+        "title": "طلبات الهدر",
+        "sub": "حركات الهدر"
+      },
+      "wastePercent": {
+        "title": "هدر كنسبة من تكلفة الطعام",
+        "sub": "الهدر / تكلفة الطعام"
+      }
+    },
+    "peakHours": {
+      "peakOrders": {
+        "title": "طلبات ساعة الذروة",
+        "sub": "ساعة الذروة"
+      },
+      "busiestHour": {
+        "title": "ساعة الذروة",
+        "sub": "بعدد الطلبات المفتوحة"
+      },
+      "avgDailyOrders": {
+        "title": "متوسط الطلبات اليومية",
+        "sub": "الطلب يوميًا"
+      }
+    },
+    "tableTurnover": {
+      "overallAvg": {
+        "title": "المتوسط العام",
+        "sub": "من الفتح إلى الإغلاق"
+      },
+      "tablesTracked": {
+        "title": "الطاولات المُطابَقة",
+        "sub": "في النافذة"
+      }
+    },
+    "repeatCustomers": {
+      "repeatCount": { "title": "العملاء المتكررون", "sub": "طلبوا أكثر من مرة" },
+      "repeatShare": { "title": "الطلبات من المتكررين", "sub": "من الطلبات التي بها رقم هاتف" }
+    }
+  },
+  "flags": {
+    "bestSeller": "الأكثر مبيعًا",
+    "worstSeller": "الأقل مبيعًا"
+  },
+  "columns": {
+    "productPerformance": {
+      "product": "المنتج",
+      "category": "الفئة",
+      "unitsSold": "الوحدات المباعة",
+      "revenue": "الإيرادات"
+    },
+    "margins": {
+      "product": "المنتج",
+      "revenue": "الإيرادات",
+      "cost": "التكلفة",
+      "margin": "الهامش",
+      "marginPct": "نسبة الهامش %"
+    },
+    "repeatCustomers": {
+      "phone": "الهاتف",
+      "visits": "الزيارات",
+      "totalSpend": "إجمالي الإنفاق",
+      "lastOrder": "آخر طلب"
+    }
+  },
+  "reportDate": {
+    "buttonLabel": "نطاق التاريخ",
+    "windowChip": "النافذة: {{window}}",
+    "filterTitle": "تصفية حسب التاريخ",
+    "presets": {
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "thisWeek": "هذا الأسبوع",
+      "lastWeek": "الأسبوع الماضي",
+      "thisMonth": "هذا الشهر",
+      "lastMonth": "الشهر الماضي",
+      "thisYear": "هذا العام",
+      "lastYear": "العام الماضي",
+      "custom": "نطاق مخصص"
+    },
+    "window": {
+      "label": "النافذة"
+    },
+    "custom": {
+      "label": "نطاق مخصص",
+      "from": {
+        "label": "من",
+        "placeholder": "YYYY-MM-DD",
+        "hint": "يتجاوز النطاق الجاهز"
+      },
+      "to": {
+        "label": "إلى",
+        "placeholder": "YYYY-MM-DD"
+      }
+    }
+  },
+  "export": {
+    "csv": "تصدير CSV",
+    "print": "طباعة",
+    "downloading": "جاري التحميل…"
+  },
+  "backToReports": "كل التقارير",
+  "summary": {
+    "busiestHour": "ساعة الذروة: {{hour}} — {{count}} طلبات مفتوحة.",
+    "topSeller": "الأكثر مبيعًا حتى الآن: {{name}} — بإيرادات {{revenue}}.",
+    "tableTurnover": {
+      "overallAvg": "المتوسط العام: {{minutes}} دقيقة من الفتح إلى الإغلاق.",
+      "tablesTracked": "{{count}} طاولة مُطابَقة في هذه النافذة."
+    }
+  },
+  "empty": {
+    "noOrders": {
+      "title": "لا طلبات في هذه النافذة",
+      "description": "وسّع النافذة الزمنية أو أزل الفلاتر لترى الطلبات هنا."
+    },
+    "noTables": {
+      "title": "لا طاولات في هذه النافذة",
+      "description": "وسّع النافذة الزمنية لترى بيانات الطاولات هنا."
+    },
+    "noProducts": {
+      "title": "لا منتجات في هذه النافذة",
+      "description": "وسّع النافذة الزمنية لترى بيانات المنتجات هنا."
+    },
+    "filteredBySearch": {
+      "title": "لا طلبات مطابقة لهذا البحث",
+      "description": "أزل البحث لترى القائمة الكاملة الأخيرة."
+    },
+    "noProductSales": {
+      "title": "لا مبيعات بعد",
+      "description": "ستظهر الطلبات المغلقة هنا فور بيع المنتجات."
+    },
+    "noMarginSales": {
+      "title": "لا مبيعات بعد",
+      "description": "تُحسب الهوامش من الطلبات المغلقة."
+    },
+    "noRepeatCustomers": {
+      "title": "لا عملاء متكررون بعد",
+      "description": "العملاء الذين يطلبون أكثر من مرة سيظهرون هنا."
+    }
+  },
+  "lowStock": {
+    "heading": "قائمة تنبيه المخزون المنخفض",
+    "empty": "كل شيء فوق حد الطلب الأدنى.",
+    "more": "+{{count}} أخرى",
+    "viewAll": "عرض الكل"
+  }
+}

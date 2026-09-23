@@ -23,17 +23,14 @@ import {
   useFilterPanelState,
   type FilterChip,
 } from "@/components/ui/FilterPanel";
+import { tableStatusLabel } from "@/lib/i18n/labels";
+import { useLocale } from "@/lib/i18n/useLocale";
+import { useTranslation } from "react-i18next";
 
 const STATUS_TONE: Record<TableStatus, "neutral" | "accent" | "warn"> = {
   empty: "neutral",
   occupied: "accent",
   "needs-bill": "warn",
-};
-
-const STATUS_LABEL: Record<TableStatus, string> = {
-  empty: "Empty",
-  occupied: "Occupied",
-  "needs-bill": "Needs bill",
 };
 
 type StatusFilter = "all" | TableStatus;
@@ -55,6 +52,9 @@ export default function TablesPage() {
 
   const { open, toggle } = useFilterPanelState("table-filters");
   const { showToast } = useToast();
+  const { t } = useTranslation("tables");
+  const { t: tCommon } = useTranslation("common");
+  const { locale } = useLocale();
 
   const refresh = useCallback(() => {
     getTables().then(setTables);
@@ -68,8 +68,8 @@ export default function TablesPage() {
   const activeCount = countActiveFilters({ status: statusFilter !== "all" ? statusFilter : "", sort: sortKey !== "label" ? sortKey : "" });
 
   const chips: FilterChip[] = [];
-  if (statusFilter !== "all") chips.push({ key: "status", label: `Status: ${STATUS_LABEL[statusFilter]}` });
-  if (sortKey !== "label") chips.push({ key: "sort", label: "Sorted by status" });
+  if (statusFilter !== "all") chips.push({ key: "status", label: t("chipStatus", { status: tableStatusLabel(tCommon, statusFilter) }) });
+  if (sortKey !== "label") chips.push({ key: "sort", label: t("chipSortedByStatus") });
 
   function removeChip(key: string) {
     if (key === "status") setStatusFilter("all");
@@ -90,9 +90,11 @@ export default function TablesPage() {
     });
 
     return [...list].sort((a, b) =>
-      sortKey === "status" ? a.status.localeCompare(b.status) : a.label.localeCompare(b.label, undefined, { numeric: true })
+      sortKey === "status"
+        ? a.status.localeCompare(b.status, locale)
+        : a.label.localeCompare(b.label, locale, { numeric: true })
     );
-  }, [tables, search, statusFilter, sortKey]);
+  }, [tables, search, statusFilter, sortKey, locale]);
 
   const inUseCount = (tables ?? []).filter((table) => table.status !== "empty" || table.sessionToken).length;
 
@@ -103,7 +105,7 @@ export default function TablesPage() {
       await createTable({ label: newLabel });
       setNewLabel("");
       refresh();
-      showToast("Table added", "success");
+      showToast(t("toastAdded"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -117,7 +119,7 @@ export default function TablesPage() {
       await updateTable(id, { label: editLabel });
       setEditingId(null);
       refresh();
-      showToast("Table renamed", "success");
+      showToast(t("toastRenamed"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -126,12 +128,12 @@ export default function TablesPage() {
   }
 
   async function handleDelete(table: Table) {
-    if (!window.confirm(`Remove table "${table.label}" from the floor plan?`)) return;
+    if (!window.confirm(t("confirmDelete", { label: table.label }))) return;
     setDeletingId(table.id);
     try {
       await deleteTable(table.id);
       refresh();
-      showToast("Table removed", "success");
+      showToast(t("toastRemoved"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -141,7 +143,7 @@ export default function TablesPage() {
   const columns: DataTableColumn<Table>[] = [
     {
       key: "label",
-      header: "Table",
+      header: t("colTable"),
       sortable: true,
       accessor: (table) => table.label,
       render: (table) =>
@@ -161,20 +163,20 @@ export default function TablesPage() {
     },
     {
       key: "status",
-      header: "Status",
+      header: t("colStatus"),
       sortable: true,
       accessor: (table) => table.status,
-      render: (table) => <StatusPill label={STATUS_LABEL[table.status]} tone={STATUS_TONE[table.status]} size="sm" />,
+      render: (table) => <StatusPill label={tableStatusLabel(tCommon, table.status)} tone={STATUS_TONE[table.status]} size="sm" />,
     },
     {
       key: "session",
-      header: "QR session",
+      header: t("colQrSession"),
       accessor: (table) => (table.sessionToken ? 1 : 0),
       render: (table) =>
         table.sessionToken ? (
           <code className="rounded bg-surface-sunken px-1.5 py-0.5 text-xs text-ink-soft">{table.qrCode}</code>
         ) : (
-          <span className="text-ink-soft/60">not seated</span>
+          <span className="text-ink-soft/60">{t("notSeated")}</span>
         ),
     },
     {
@@ -185,10 +187,10 @@ export default function TablesPage() {
         editingId === table.id ? (
           <div className="flex items-center justify-end gap-1.5">
             <Button size="sm" onClick={() => handleSaveEdit(table.id)} loading={savingEdit}>
-              Save
+              {tCommon("actions.save")}
             </Button>
             <Button variant="secondary" size="sm" onClick={() => setEditingId(null)} disabled={savingEdit}>
-              Cancel
+              {tCommon("actions.cancel")}
             </Button>
           </div>
         ) : (
@@ -202,7 +204,7 @@ export default function TablesPage() {
               }}
             >
               <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
-              Rename
+              {t("rename")}
             </Button>
             <Button
               variant="danger"
@@ -210,10 +212,10 @@ export default function TablesPage() {
               onClick={() => handleDelete(table)}
               loading={deletingId === table.id}
               disabled={table.status !== "empty" || Boolean(table.sessionToken)}
-              title={table.status !== "empty" || table.sessionToken ? "In use — close the bill first" : "Remove this table"}
+              title={table.status !== "empty" || table.sessionToken ? t("inUseTitle") : t("removeTitle")}
             >
               <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-              Delete
+              {tCommon("actions.delete")}
             </Button>
           </div>
         ),
@@ -222,36 +224,36 @@ export default function TablesPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Floor plan"
-        title="Tables"
-        description="Add or rename the tables on this floor. POS reads this list for its table map."
+        eyebrow={t("eyebrow")}
+        title={t("title")}
+        description={t("description")}
         actions={
           <>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search tables…" className="w-48" />
+            <SearchInput value={search} onChange={setSearch} placeholder={t("searchPlaceholder")} className="w-48" />
             <FilterToggleButton open={open} onToggle={toggle} activeCount={activeCount} />
           </>
         }
       />
 
-      <FilterPanel open={open} title="Filter tables" onReset={activeCount > 0 ? resetFilters : undefined}>
+      <FilterPanel open={open} title={t("filterTitle")} onReset={activeCount > 0 ? resetFilters : undefined}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <FilterField label="Status" htmlFor="table-status">
+          <FilterField label={t("statusLabel")} htmlFor="table-status">
             <Select id="table-status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as StatusFilter)}>
-              <option value="all">Any status</option>
-              <option value="empty">Empty</option>
-              <option value="occupied">Occupied</option>
-              <option value="needs-bill">Needs bill</option>
+              <option value="all">{t("anyStatus")}</option>
+              <option value="empty">{tableStatusLabel(tCommon, "empty")}</option>
+              <option value="occupied">{tableStatusLabel(tCommon, "occupied")}</option>
+              <option value="needs-bill">{tableStatusLabel(tCommon, "needs-bill")}</option>
             </Select>
           </FilterField>
-          <FilterField label="Sort by" htmlFor="table-sort">
+          <FilterField label={t("sortBy")} htmlFor="table-sort">
             <Select id="table-sort" value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)}>
-              <option value="label">Table name</option>
-              <option value="status">Status</option>
+              <option value="label">{t("sortLabel")}</option>
+              <option value="status">{t("sortStatus")}</option>
             </Select>
           </FilterField>
-          <FilterField label="Right now" className="sm:col-span-2">
+          <FilterField label={t("rightNow")} className="sm:col-span-2">
             <p className="rounded-lg border border-border bg-surface-sunken px-3 py-2 text-sm text-ink-soft">
-              {filtered?.length ?? 0} of {tables?.length ?? 0} tables shown · {inUseCount} currently in use
+              {t("summary", { shown: filtered?.length ?? 0, total: tables?.length ?? 0, inUse: inUseCount })}
             </p>
           </FilterField>
         </div>
@@ -265,18 +267,18 @@ export default function TablesPage() {
               htmlFor="new-table-label"
               className="mb-1.5 block text-[11px] font-semibold uppercase tracking-wide text-ink-soft"
             >
-              New table
+              {t("newTable")}
             </label>
             <Input
               id="new-table-label"
               value={newLabel}
               onChange={(event) => setNewLabel(event.target.value)}
-              placeholder="e.g. Patio 6"
+              placeholder={t("newTablePlaceholder")}
               required
             />
           </div>
           <Button type="submit" loading={creating}>
-            Add table
+            {t("addTable")}
           </Button>
         </form>
       </Card>
@@ -286,17 +288,13 @@ export default function TablesPage() {
         data={filtered}
         keyField={(table) => table.id}
         emptyIcon={LayoutGrid}
-        emptyTitle={search || activeCount > 0 ? "No tables match" : "No tables yet"}
+        emptyTitle={search || activeCount > 0 ? t("emptyFilteredTitle") : t("emptyTitle")}
         emptyDescription={
-          search || activeCount > 0
-            ? "Try a different search or clear the filters."
-            : "Add your first table above — it appears instantly on the POS table map."
+          search || activeCount > 0 ? t("emptyFilteredDescription") : t("emptyDescription")
         }
       />
 
-      <p className="mt-3 text-xs text-ink-soft">
-        Tables with an open bill can't be deleted — settle the bill from POS first. QR sessions are minted when a table is opened.
-      </p>
+      <p className="mt-3 text-xs text-ink-soft">{t("footerNote")}</p>
     </AdminShell>
   );
 }

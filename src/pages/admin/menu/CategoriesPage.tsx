@@ -5,6 +5,7 @@ import type { Category } from "@/types";
 import { createCategory, deleteCategory, getCategories, getProducts, updateCategory, type ProductWithCategory } from "@/lib/api/products";
 import { countActiveFilters, matchesSearch } from "@/lib/filters";
 import { errorMessage } from "@/lib/errors";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/ui/Toast";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
@@ -46,6 +47,8 @@ export default function CategoriesPage() {
 
   const { open, toggle } = useFilterPanelState("menu-category-filters");
   const { showToast } = useToast();
+  const { t } = useTranslation("menu");
+  const { t: tCommon } = useTranslation("common");
 
   const refresh = useCallback(() => {
     getCategories().then(setCategories);
@@ -71,8 +74,16 @@ export default function CategoriesPage() {
   });
 
   const chips: FilterChip[] = [];
-  if (sizeFilter !== "all") chips.push({ key: "size", label: `Usage: ${sizeFilter === "empty" ? "empty" : "has products"}` });
-  if (sortBy !== "order") chips.push({ key: "sort", label: `Sorted by ${sortBy}` });
+  if (sizeFilter !== "all") {
+    chips.push({
+      key: "size",
+      label: sizeFilter === "empty" ? t("categoriesPage.chips.usageEmpty") : t("categoriesPage.chips.usagePopulated"),
+    });
+  }
+  if (sortBy !== "order") {
+    const sortLabel = sortBy === "name" ? t("categoriesPage.sortBy.name") : t("categoriesPage.sortBy.products");
+    chips.push({ key: "sort", label: t("categoriesPage.chips.sortedBy", { sort: sortLabel }) });
+  }
 
   function removeChip(key: string) {
     if (key === "size") setSizeFilter("all");
@@ -107,7 +118,7 @@ export default function CategoriesPage() {
       setName("");
       setSortOrder("");
       refresh();
-      showToast("Category created", "success");
+      showToast(t("categoriesPage.toastCreated"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -126,7 +137,7 @@ export default function CategoriesPage() {
       await updateCategory(id, { name: editDraft.name, sortOrder: Number(editDraft.sortOrder) || 0 });
       setEditingId(null);
       refresh();
-      showToast("Category updated", "success");
+      showToast(t("categoriesPage.toastUpdated"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -135,12 +146,12 @@ export default function CategoriesPage() {
   }
 
   async function handleDelete(category: CategoryRow) {
-    if (!window.confirm(`Delete category "${category.name}"?`)) return;
+    if (!window.confirm(t("categoriesPage.deleteConfirm", { name: category.name }))) return;
     setDeletingId(category.id);
     try {
       await deleteCategory(category.id);
       refresh();
-      showToast("Category deleted", "success");
+      showToast(t("categoriesPage.toastDeleted"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -150,7 +161,7 @@ export default function CategoriesPage() {
   const columns: DataTableColumn<CategoryRow>[] = [
     {
       key: "sortOrder",
-      header: "#",
+      header: t("categoriesPage.columns.order"),
       sortable: true,
       align: "right",
       accessor: (row) => row.sortOrder,
@@ -169,7 +180,7 @@ export default function CategoriesPage() {
     },
     {
       key: "name",
-      header: "Category",
+      header: t("categoriesPage.columns.name"),
       sortable: true,
       accessor: (row) => row.name,
       render: (row) =>
@@ -185,13 +196,13 @@ export default function CategoriesPage() {
     },
     {
       key: "products",
-      header: "Products",
+      header: t("categoriesPage.columns.products"),
       sortable: true,
       align: "right",
       accessor: (row) => row.productCount,
       render: (row) => (
         <StatusPill
-          label={row.productCount === 0 ? "Empty" : `${row.productCount} item${row.productCount === 1 ? "" : "s"}`}
+          label={row.productCount === 0 ? t("categoriesPage.productCountEmpty") : t("categoriesPage.productCount", { count: row.productCount })}
           tone={row.productCount === 0 ? "warn" : "accent"}
           size="sm"
         />
@@ -205,17 +216,17 @@ export default function CategoriesPage() {
         editingId === row.id ? (
           <div className="flex items-center justify-end gap-1.5">
             <Button size="sm" onClick={() => saveEdit(row.id)} loading={savingEdit}>
-              Save
+              {tCommon("actions.save")}
             </Button>
             <Button variant="secondary" size="sm" onClick={() => setEditingId(null)} disabled={savingEdit}>
-              Cancel
+              {tCommon("actions.cancel")}
             </Button>
           </div>
         ) : (
           <div className="flex items-center justify-end gap-1.5">
             <Button variant="secondary" size="sm" onClick={() => startEdit(row)}>
               <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
-              Edit
+              {tCommon("actions.edit")}
             </Button>
             <Button
               variant="danger"
@@ -223,10 +234,10 @@ export default function CategoriesPage() {
               onClick={() => handleDelete(row)}
               loading={deletingId === row.id}
               disabled={row.productCount > 0}
-              title={row.productCount > 0 ? "Move its products to another category first" : "Delete category"}
+              title={row.productCount > 0 ? t("categoriesPage.deleteDisabledTitle") : t("categoriesPage.deleteTitle")}
             >
               <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-              Delete
+              {tCommon("actions.delete")}
             </Button>
           </div>
         ),
@@ -235,43 +246,48 @@ export default function CategoriesPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Menu · Categories"
-        title="Menu categories"
-        description="The tabs guests and cashiers see. Sort order controls where each one appears."
+        eyebrow={t("categoriesPage.eyebrow")}
+        title={t("categoriesPage.title")}
+        description={t("categoriesPage.description")}
         actions={
           <>
             <Link to="/admin/menu" className="text-sm font-medium text-accent hover:text-accent-hover">
-              ← Back to menu
+              ← {t("categoriesPage.back")}
             </Link>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search categories…" className="w-52" />
+            <SearchInput
+              value={search}
+              onChange={setSearch}
+              placeholder={t("categoriesPage.searchPlaceholder")}
+              className="w-52"
+            />
             <FilterToggleButton open={open} onToggle={toggle} activeCount={activeCount} />
           </>
         }
       />
 
-      <FilterPanel open={open} title="Filter categories" onReset={activeCount > 0 ? resetFilters : undefined}>
+      <FilterPanel open={open} title={t("categoriesPage.filterTitle")} onReset={activeCount > 0 ? resetFilters : undefined}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <FilterField label="Usage" htmlFor="category-usage">
+          <FilterField label={t("categoriesPage.usage.label")} htmlFor="category-usage">
             <Select
               id="category-usage"
               value={sizeFilter}
               onChange={(event) => setSizeFilter(event.target.value as typeof sizeFilter)}
             >
-              <option value="all">All categories</option>
-              <option value="populated">Has products</option>
-              <option value="empty">Empty</option>
+              <option value="all">{t("categoriesPage.usage.all")}</option>
+              <option value="populated">{t("categoriesPage.usage.populated")}</option>
+              <option value="empty">{t("categoriesPage.usage.empty")}</option>
             </Select>
           </FilterField>
-          <FilterField label="Sort by" htmlFor="category-sort">
+          <FilterField label={t("categoriesPage.sortBy.label")} htmlFor="category-sort">
             <Select id="category-sort" value={sortBy} onChange={(event) => setSortBy(event.target.value as typeof sortBy)}>
-              <option value="order">Menu order</option>
-              <option value="name">Name</option>
-              <option value="products">Most products</option>
+              <option value="order">{t("categoriesPage.sortBy.order")}</option>
+              <option value="name">{t("categoriesPage.sortBy.name")}</option>
+              <option value="products">{t("categoriesPage.sortBy.products")}</option>
             </Select>
           </FilterField>
-          <FilterField label="Showing" className="sm:col-span-2">
+          <FilterField label={t("categoriesPage.showingLabel")} className="sm:col-span-2">
             <p className="rounded-lg border border-border bg-surface-sunken px-3 py-2 text-sm text-ink-soft">
-              {filtered.length} of {rows.length} categories shown
+              {t("categoriesPage.showing", { shown: filtered.length, total: rows.length })}
             </p>
           </FilterField>
         </div>
@@ -281,18 +297,18 @@ export default function CategoriesPage() {
       <Card className="mb-4" padding="md">
         <form onSubmit={handleCreate} className="flex flex-wrap items-end gap-3">
           <div className="min-w-[12rem] flex-1">
-            <InlineLabel label="New category" htmlFor="new-category-name">
+            <InlineLabel label={t("categoriesPage.newCategory.label")} htmlFor="new-category-name">
               <Input
                 id="new-category-name"
                 value={name}
                 onChange={(event) => setName(event.target.value)}
-                placeholder="e.g. Desserts"
+                placeholder={t("categoriesPage.newCategory.placeholder")}
                 required
               />
             </InlineLabel>
           </div>
           <div className="w-28">
-            <InlineLabel label="Sort order" htmlFor="new-category-order">
+            <InlineLabel label={t("categoriesPage.newCategory.sortOrderLabel")} htmlFor="new-category-order">
               <Input
                 id="new-category-order"
                 type="number"
@@ -304,7 +320,7 @@ export default function CategoriesPage() {
             </InlineLabel>
           </div>
           <Button type="submit" loading={saving}>
-            Add category
+            {t("categoriesPage.addButton")}
           </Button>
         </form>
       </Card>
@@ -314,11 +330,11 @@ export default function CategoriesPage() {
         data={filtered}
         keyField={(row) => row.id}
         emptyIcon={Tags}
-        emptyTitle={search || activeCount > 0 ? "No categories match" : "No categories yet"}
+        emptyTitle={search || activeCount > 0 ? t("categoriesPage.emptyFilteredTitle") : t("categoriesPage.emptyTitle")}
         emptyDescription={
           search || activeCount > 0
-            ? "Try a different search or clear the filters."
-            : "Add a category above, then assign products to it from the menu."
+            ? t("categoriesPage.emptyFilteredDescription")
+            : t("categoriesPage.emptyDescription")
         }
       />
     </AdminShell>

@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { Clock, Pencil, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Shift, Staff } from "@/types";
 import { clockIn, clockOut, deleteStaff, getActiveShift, getShiftsForStaff, getStaffById } from "@/lib/api/staff";
 import { formatDateTime } from "@/lib/format";
+import { roleLabel } from "@/lib/i18n/labels";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/components/ui/Toast";
 import AdminShell from "@/components/ui/AdminShell";
@@ -30,6 +32,8 @@ export default function StaffDetailPage() {
   const { staff: currentStaff } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const { t } = useTranslation("staff");
+  const { t: tCommon } = useTranslation("common");
 
   const refresh = useCallback(() => {
     getShiftsForStaff(staffId).then(setShifts);
@@ -46,7 +50,7 @@ export default function StaffDetailPage() {
     await clockIn(staffId);
     refresh();
     setClocking(false);
-    showToast("Clocked in", "success");
+    showToast(t("detail.toastClockedIn"), "success");
   }
 
   async function handleClockOut() {
@@ -54,36 +58,36 @@ export default function StaffDetailPage() {
     await clockOut(staffId);
     refresh();
     setClocking(false);
-    showToast("Clocked out", "success");
+    showToast(t("detail.toastClockedOut"), "success");
   }
 
   async function handleDelete() {
     if (!staff) return;
-    if (!window.confirm(`Remove "${staff.name}" from staff? This can't be undone.`)) return;
+    if (!window.confirm(t("confirmDelete", { name: staff.name }))) return;
     setDeleting(true);
     await deleteStaff(staffId);
-    showToast("Staff member removed", "success");
+    showToast(t("toastRemoved"), "success");
     navigate("/admin/staff");
   }
 
   const columns: DataTableColumn<Shift>[] = [
     {
       key: "clockIn",
-      header: "Clocked in",
+      header: t("detail.colClockIn"),
       sortable: true,
       accessor: (shift) => shift.clockIn,
       render: (shift) => <span className="text-ink">{formatDateTime(shift.clockIn)}</span>,
     },
     {
       key: "clockOut",
-      header: "Clocked out",
+      header: t("detail.colClockOut"),
       sortable: true,
       accessor: (shift) => shift.clockOut ?? "",
       render: (shift) => <span className="text-ink-soft">{shift.clockOut ? formatDateTime(shift.clockOut) : "—"}</span>,
     },
     {
       key: "duration",
-      header: "Duration",
+      header: t("detail.colDuration"),
       align: "right",
       render: (shift) => <span className="tabular-nums text-ink">{formatDuration(shift.clockIn, shift.clockOut)}</span>,
     },
@@ -93,28 +97,32 @@ export default function StaffDetailPage() {
 
   return (
     <AdminShell>
-      <PageHeader eyebrow="Staff" title={staff ? staff.name : "Staff member"} actions={<BackLink to="/admin/staff" label="Back to team" />} />
+      <PageHeader
+        eyebrow={t("eyebrow")}
+        title={staff ? staff.name : t("detail.fallbackTitle")}
+        actions={<BackLink to="/admin/staff" label={t("backToTeam")} />}
+      />
 
       {staff && (
         <div className="mb-5 flex flex-wrap items-center gap-3">
-          <StatusPill label={staff.role} tone="accent" />
+          <StatusPill label={roleLabel(tCommon, staff.role)} tone="accent" />
           {activeShift ? (
             <>
-              <StatusPill label="On shift" tone="good" />
+              <StatusPill label={t("detail.onShift")} tone="good" />
               <Button variant="secondary" size="sm" onClick={handleClockOut} loading={clocking}>
-                Clock out
+                {t("detail.clockOut")}
               </Button>
             </>
           ) : (
             <Button size="sm" onClick={handleClockIn} loading={clocking}>
-              Clock in
+              {t("detail.clockIn")}
             </Button>
           )}
           <div className="ms-auto flex items-center gap-1.5">
             <Link to={`/admin/staff/${staffId}/edit`}>
               <Button variant="secondary" size="sm">
                 <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
-                Edit
+                {tCommon("actions.edit")}
               </Button>
             </Link>
             <Button
@@ -123,10 +131,10 @@ export default function StaffDetailPage() {
               onClick={handleDelete}
               loading={deleting}
               disabled={isSelf}
-              title={isSelf ? "You can't remove your own account" : undefined}
+              title={isSelf ? t("cantRemoveSelf") : undefined}
             >
               <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-              Delete
+              {tCommon("actions.delete")}
             </Button>
           </div>
         </div>
@@ -137,8 +145,8 @@ export default function StaffDetailPage() {
         data={shifts}
         keyField={(shift) => shift.id}
         emptyIcon={Clock}
-        emptyTitle="No shifts logged yet"
-        emptyDescription="Clock in to start tracking hours."
+        emptyTitle={t("detail.emptyTitle")}
+        emptyDescription={t("detail.emptyDescription")}
       />
     </AdminShell>
   );

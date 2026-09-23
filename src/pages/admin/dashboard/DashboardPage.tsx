@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
   Boxes,
@@ -13,7 +14,7 @@ import {
   TrendingUp,
   Users,
 } from "lucide-react";
-import type { Category, Table } from "@/types";
+import type { Category, OrderStatus, PaymentMethod, Table } from "@/types";
 import {
   getDashboardSummary,
   getRecentOrders,
@@ -27,7 +28,8 @@ import { getTables } from "@/lib/api/tables";
 import { on } from "@/lib/eventBus";
 import { exportToCsv } from "@/lib/csv";
 import { countActiveFilters, matchesSearch, RANGE_PRESETS, rangeLabel, resolveRange } from "@/lib/filters";
-import { formatDate } from "@/lib/format";
+import { formatCurrency, formatDate, formatNumber } from "@/lib/format";
+import { orderStatusLabel, paymentMethodLabel, tableStatusLabel } from "@/lib/i18n/labels";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
 import Card from "@/components/ui/Card";
@@ -49,8 +51,8 @@ import {
   type FilterChip,
 } from "@/components/ui/FilterPanel";
 
-const PAYMENT_METHODS = ["cash", "card", "other"];
-const ORDER_STATUSES = ["open", "sent", "preparing", "ready", "served", "closed", "cancelled"];
+const PAYMENT_METHODS: PaymentMethod[] = ["cash", "card", "other"];
+const ORDER_STATUSES: OrderStatus[] = ["open", "sent", "preparing", "ready", "served", "closed", "cancelled"];
 
 const STATUS_TONE: Record<string, "neutral" | "accent" | "warn" | "good" | "danger" | "info"> = {
   open: "accent",
@@ -62,7 +64,17 @@ const STATUS_TONE: Record<string, "neutral" | "accent" | "warn" | "good" | "dang
   cancelled: "danger",
 };
 
+const QUICK_LINKS = [
+  { to: "/admin/reports/sales", key: "sales" as const },
+  { to: "/admin/reports/margins", key: "margins" as const },
+  { to: "/admin/reports/wastage", key: "wastage" as const },
+  { to: "/admin/reports/peak-hours", key: "peakHours" as const },
+];
+
 export default function DashboardPage() {
+  const { t } = useTranslation("dashboard");
+  const { t: tCommon } = useTranslation("common");
+
   const [summary, setSummary] = useState<DashboardSummary | null>(null);
   const [recentOrders, setRecentOrders] = useState<RecentOrderRow[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -113,21 +125,31 @@ export default function DashboardPage() {
   });
 
   const chips: FilterChip[] = [];
-  if (customFrom || customTo) {
-    chips.push({ key: "range", label: `Window: ${rangeLabel({ days, from: customFrom, to: customTo })}` });
-  } else if (days !== 14) {
-    chips.push({ key: "range", label: `Window: last ${days} days` });
+  if (customFrom || customTo || days !== 14) {
+    chips.push({
+      key: "range",
+      label: t("filters.rangeChip", { window: rangeLabel({ days, from: customFrom, to: customTo }) }),
+    });
   }
   if (categoryId !== "all") {
     chips.push({
       key: "category",
-      label: `Category: ${categories.find((category) => category.id === categoryId)?.name ?? categoryId}`,
+      label: t("filters.categoryChip", {
+        category: categories.find((category) => category.id === categoryId)?.name ?? categoryId,
+      }),
     });
   }
-  if (method !== "all") chips.push({ key: "method", label: `Paid by ${method}` });
-  if (status !== "all") chips.push({ key: "status", label: `Orders: ${status}` });
+  if (method !== "all") {
+    chips.push({ key: "method", label: t("filters.methodChip", { method: paymentMethodLabel(tCommon, method as PaymentMethod) }) });
+  }
+  if (status !== "all") {
+    chips.push({ key: "status", label: t("filters.statusChip", { status: orderStatusLabel(tCommon, status as OrderStatus) }) });
+  }
   if (tableId !== "all") {
-    chips.push({ key: "table", label: `Table: ${tables.find((table) => table.id === tableId)?.label ?? tableId}` });
+    chips.push({
+      key: "table",
+      label: t("filters.tableChip", { table: tables.find((table) => table.id === tableId)?.label ?? tableId }),
+    });
   }
 
   function removeChip(key: string) {
@@ -155,7 +177,10 @@ export default function DashboardPage() {
   const current = summary?.current;
   const trendChart = (current?.byDay ?? []).map((day) => ({ label: day.date.slice(5), value: day.revenue }));
   const categoryChart = (current?.byCategory ?? []).slice(0, 6);
-  const methodChart = current?.byMethod ?? [];
+  const methodChart = (current?.byMethod ?? []).map((entry) => ({
+    ...entry,
+    label: paymentMethodLabel(tCommon, entry.label as PaymentMethod),
+  }));
   const lowStock = summary?.lowStock ?? [];
 
   const filteredOrders = useMemo(() => {
@@ -178,49 +203,49 @@ export default function DashboardPage() {
   const orderColumns: DataTableColumn<RecentOrderRow>[] = [
     {
       key: "table",
-      header: "Table",
+      header: t("columns.table"),
       sortable: true,
       accessor: (row) => row.tableLabel,
       render: (row) => (
         <div>
           <p className="font-medium text-ink">{row.tableLabel}</p>
-          <p className="text-xs text-ink-soft">{row.source === "qr" ? "QR order" : "POS"}</p>
+          <p className="text-xs text-ink-soft">{row.source === "qr" ? t("columns.qrOrder") : t("columns.pos")}</p>
         </div>
       ),
     },
     {
       key: "status",
-      header: "Status",
+      header: t("columns.status"),
       sortable: true,
       accessor: (row) => row.status,
-      render: (row) => <StatusPill label={row.status} tone={STATUS_TONE[row.status] ?? "neutral"} size="sm" />,
+      render: (row) => <StatusPill label={orderStatusLabel(tCommon, row.status)} tone={STATUS_TONE[row.status] ?? "neutral"} size="sm" />,
     },
     {
       key: "items",
-      header: "Items",
+      header: t("columns.items"),
       sortable: true,
       align: "right",
       accessor: (row) => row.itemCount,
-      render: (row) => <span className="tabular-nums text-ink-soft">{row.itemCount}</span>,
+      render: (row) => <span className="tabular-nums text-ink-soft">{formatNumber(row.itemCount)}</span>,
     },
     {
       key: "total",
-      header: "Total",
+      header: t("columns.total"),
       sortable: true,
       align: "right",
       accessor: (row) => row.total,
-      render: (row) => <span className="tabular-nums font-medium text-ink">${row.total.toFixed(2)}</span>,
+      render: (row) => <span className="tabular-nums font-medium text-ink">{formatCurrency(row.total)}</span>,
     },
     {
       key: "payment",
-      header: "Payment",
+      header: t("columns.payment"),
       sortable: true,
       accessor: (row) => row.methods,
       render: (row) => <span className="text-xs text-ink-soft">{row.methods}</span>,
     },
     {
       key: "opened",
-      header: "Opened",
+      header: t("columns.opened"),
       sortable: true,
       accessor: (row) => row.openedAt,
       render: (row) => <span className="text-ink-soft">{formatDate(row.openedAt)}</span>,
@@ -229,55 +254,60 @@ export default function DashboardPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Dashboard"
-        title="Quick review"
+        eyebrow={t("page.eyebrow")}
+        title={t("page.title")}
         description={
           summary
-            ? `${summary.window.from} → ${summary.window.to} · compared with ${summary.window.previousFrom} → ${summary.window.previousTo}`
-            : "Loading the latest numbers…"
+            ? t("page.description", {
+                from: formatDate(summary.window.from),
+                to: formatDate(summary.window.to),
+                prevFrom: formatDate(summary.window.previousFrom),
+                prevTo: formatDate(summary.window.previousTo),
+              })
+            : t("page.loading")
         }
         actions={
           <>
-            <SearchInput value={orderSearch} onChange={setOrderSearch} placeholder="Search orders…" className="w-48" />
+            <SearchInput value={orderSearch} onChange={setOrderSearch} placeholder={t("actions.searchPlaceholder")} className="w-48" />
             <FilterToggleButton open={open} onToggle={toggle} activeCount={activeCount} />
-            <Button variant="secondary" onClick={handleExport} title="Export the filtered orders">
+            <Button variant="secondary" onClick={handleExport} title={t("actions.exportTitle")}>
               <Download className="h-3.5 w-3.5" strokeWidth={2} />
-              CSV
+              {t("actions.exportCsv")}
             </Button>
             <Button variant="secondary" onClick={refresh}>
               <RefreshCw className="h-3.5 w-3.5" strokeWidth={2} />
-              Refresh
+              {t("actions.refresh")}
             </Button>
             <Link to="/admin/reports">
-              <Button>All reports</Button>
+              <Button>{t("actions.allReports")}</Button>
             </Link>
           </>
         }
       />
 
-      <FilterPanel open={open} title="Filter everything on this page" onReset={activeCount > 0 ? resetFilters : undefined}>
+      <FilterPanel open={open} title={t("filters.panelTitle")} onReset={activeCount > 0 ? resetFilters : undefined}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          <FilterField label="Window" htmlFor="dash-days">
+          <FilterField label={t("filters.window")} htmlFor="dash-days">
             <Select id="dash-days" value={days} onChange={(event) => setDays(Number(event.target.value))}>
               {RANGE_PRESETS.map((option) => (
                 <option key={option} value={option}>
-                  Last {option} days
+                  {tCommon("range.lastDays", { count: option })}
                 </option>
               ))}
             </Select>
           </FilterField>
 
-          <FilterField label="From" htmlFor="dash-from" hint="Overrides the preset">
+          <FilterField label={t("filters.from")} htmlFor="dash-from" hint={t("filters.fromHint")}>
             <Input id="dash-from" type="date" value={customFrom} onChange={(event) => setCustomFrom(event.target.value)} />
           </FilterField>
 
-          <FilterField label="To" htmlFor="dash-to">
+          <FilterField label={t("filters.to")} htmlFor="dash-to">
             <Input id="dash-to" type="date" value={customTo} onChange={(event) => setCustomTo(event.target.value)} />
           </FilterField>
 
-          <FilterField label="Category" htmlFor="dash-category">
+          <FilterField label={t("filters.category")} htmlFor="dash-category">
             <Select id="dash-category" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
-              <option value="all">All categories</option>
+              <option value="all">{t("filters.allCategories")}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -286,31 +316,31 @@ export default function DashboardPage() {
             </Select>
           </FilterField>
 
-          <FilterField label="Payment method" htmlFor="dash-method">
+          <FilterField label={t("filters.paymentMethod")} htmlFor="dash-method">
             <Select id="dash-method" value={method} onChange={(event) => setMethod(event.target.value)}>
-              <option value="all">Any method</option>
+              <option value="all">{t("filters.anyMethod")}</option>
               {PAYMENT_METHODS.map((option) => (
                 <option key={option} value={option}>
-                  {option}
+                  {paymentMethodLabel(tCommon, option)}
                 </option>
               ))}
             </Select>
           </FilterField>
 
-          <FilterField label="Order status" htmlFor="dash-status">
+          <FilterField label={t("filters.orderStatus")} htmlFor="dash-status">
             <Select id="dash-status" value={status} onChange={(event) => setStatus(event.target.value)}>
-              <option value="all">Any status</option>
+              <option value="all">{t("filters.anyStatus")}</option>
               {ORDER_STATUSES.map((option) => (
                 <option key={option} value={option}>
-                  {option}
+                  {orderStatusLabel(tCommon, option)}
                 </option>
               ))}
             </Select>
           </FilterField>
 
-          <FilterField label="Table" htmlFor="dash-table" className="sm:col-span-2">
+          <FilterField label={t("filters.table")} htmlFor="dash-table" className="sm:col-span-2">
             <Select id="dash-table" value={tableId} onChange={(event) => setTableId(event.target.value)}>
-              <option value="all">Every table</option>
+              <option value="all">{t("filters.everyTable")}</option>
               {tables.map((table) => (
                 <option key={table.id} value={table.id}>
                   {table.label}
@@ -319,134 +349,156 @@ export default function DashboardPage() {
             </Select>
           </FilterField>
 
-          <FilterField label="Live counts" className="sm:col-span-2 lg:col-span-3">
+          <FilterField label={t("filters.liveCounts")} className="sm:col-span-2 lg:col-span-3">
             <p className="rounded-lg border border-border bg-surface-sunken px-3 py-2 text-sm text-ink-soft">
-              {summary?.openOrderCount ?? 0} open orders · {summary?.tableStatus.occupied ?? 0} seated ·{" "}
-              {summary?.tableStatus.needsBill ?? 0} waiting on bill · {summary?.productCount ?? 0} menu items ·{" "}
-              {summary?.customerCount ?? 0} customers
+              {t("filters.liveCountsSummary", {
+                openOrders: summary?.openOrderCount ?? 0,
+                occupied: summary?.tableStatus.occupied ?? 0,
+                needsBill: summary?.tableStatus.needsBill ?? 0,
+                products: summary?.productCount ?? 0,
+                customers: summary?.customerCount ?? 0,
+              })}
             </p>
           </FilterField>
         </div>
         <FilterChips chips={chips} onRemove={removeChip} onClear={resetFilters} />
       </FilterPanel>
       <Card className="mt-4" padding="md">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">Live order status</p>
+        <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">{t("liveOrderStatus.heading")}</p>
         <div className="flex flex-wrap items-center gap-2">
           {ORDER_STATUS_LIST.map((orderStatus) => (
             <StatusPill
               key={orderStatus}
-              label={`${orderStatus} · ${summary?.statusCounts[orderStatus] ?? 0}`}
+              label={t("liveOrderStatus.statusCount", {
+                status: orderStatusLabel(tCommon, orderStatus),
+                count: summary?.statusCounts[orderStatus] ?? 0,
+              })}
               tone={STATUS_TONE[orderStatus] ?? "neutral"}
             />
           ))}
           <span className="mx-1 h-4 w-px bg-border" aria-hidden="true" />
-          <StatusPill label={`Empty tables · ${summary?.tableStatus.empty ?? 0}`} tone="neutral" />
-          <StatusPill label={`Occupied · ${summary?.tableStatus.occupied ?? 0}`} tone="accent" />
-          <StatusPill label={`Needs bill · ${summary?.tableStatus.needsBill ?? 0}`} tone="warn" />
+          <StatusPill
+            label={t("liveOrderStatus.statusCount", { status: tableStatusLabel(tCommon, "empty"), count: summary?.tableStatus.empty ?? 0 })}
+            tone="neutral"
+          />
+          <StatusPill
+            label={t("liveOrderStatus.statusCount", {
+              status: tableStatusLabel(tCommon, "occupied"),
+              count: summary?.tableStatus.occupied ?? 0,
+            })}
+            tone="accent"
+          />
+          <StatusPill
+            label={t("liveOrderStatus.statusCount", {
+              status: tableStatusLabel(tCommon, "needs-bill"),
+              count: summary?.tableStatus.needsBill ?? 0,
+            })}
+            tone="warn"
+          />
         </div>
       </Card>
 
       <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
         <KpiTile
           icon={DollarSign}
-          label="Revenue"
-          value={`$${(current?.revenue ?? 0).toFixed(2)}`}
+          label={t("kpi.revenue.title")}
+          value={formatCurrency(current?.revenue ?? 0)}
           delta={summary?.deltas.revenue ?? null}
-          deltaLabel={`vs previous ${summary?.window.days ?? 14} days`}
+          deltaLabel={t("kpi.deltaLabelDays", { count: summary?.window.days ?? 14 })}
           highlight
         />
         <KpiTile
           icon={Receipt}
-          label="Orders"
-          value={String(current?.orderCount ?? 0)}
+          label={t("kpi.orders.title")}
+          value={formatNumber(current?.orderCount ?? 0)}
           delta={summary?.deltas.orderCount ?? null}
-          deltaLabel={`vs previous ${summary?.window.days ?? 14} days`}
+          deltaLabel={t("kpi.deltaLabelDays", { count: summary?.window.days ?? 14 })}
         />
         <KpiTile
           icon={TrendingUp}
-          label="Avg. order value"
-          value={`$${(current?.averageOrderValue ?? 0).toFixed(2)}`}
+          label={t("kpi.avgOrderValue.title")}
+          value={formatCurrency(current?.averageOrderValue ?? 0)}
           delta={summary?.deltas.averageOrderValue ?? null}
-          deltaLabel="vs previous window"
+          deltaLabel={t("kpi.deltaLabelWindow")}
         />
-        <KpiTile icon={Clock} label="Open orders" value={String(summary?.openOrderCount ?? 0)} sub="not settled yet" />
+        <KpiTile icon={Clock} label={t("kpi.openOrders.title")} value={formatNumber(summary?.openOrderCount ?? 0)} sub={t("kpi.openOrders.sub")} />
         <KpiTile
           icon={Boxes}
-          label="Low stock"
-          value={String(lowStock.length)}
-          sub={lowStock.length ? "at or below par level" : "everything above par"}
+          label={t("kpi.lowStock.title")}
+          value={formatNumber(lowStock.length)}
+          sub={lowStock.length ? t("kpi.lowStock.subAlert") : t("kpi.lowStock.subOk")}
         />
         <KpiTile
           icon={Trash2}
-          label="Waste cost"
-          value={`$${(summary?.waste.cost ?? 0).toFixed(2)}`}
-          sub={`${summary?.waste.events ?? 0} waste events`}
+          label={t("kpi.wasteCost.title")}
+          value={formatCurrency(summary?.waste.cost ?? 0)}
+          sub={t("kpi.wasteCost.sub", { count: summary?.waste.events ?? 0 })}
         />
         <KpiTile
           icon={LayoutGrid}
-          label="Tables seated"
-          value={String(summary?.tableStatus.occupied ?? 0)}
-          sub={`${summary?.tableStatus.needsBill ?? 0} waiting on bill`}
+          label={t("kpi.tablesSeated.title")}
+          value={formatNumber(summary?.tableStatus.occupied ?? 0)}
+          sub={t("kpi.tablesSeated.sub", { count: summary?.tableStatus.needsBill ?? 0 })}
         />
         <KpiTile
           icon={Users}
-          label="Customers"
-          value={String(summary?.customerCount ?? 0)}
-          sub="with a phone on file"
+          label={t("kpi.customers.title")}
+          value={formatNumber(summary?.customerCount ?? 0)}
+          sub={t("kpi.customers.sub")}
         />
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
         <ChartWrapper
-          title={`Revenue by day (${summary?.window.days ?? 14} days)`}
+          title={t("charts.revenueByDay", { count: summary?.window.days ?? 14 })}
           action={
             <Link
               to="/admin/reports/sales"
               className="flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover"
             >
-              Full sales report
+              {t("charts.fullSalesReport")}
               <ArrowRight className="h-3 w-3 rtl:rotate-180" strokeWidth={2.5} />
             </Link>
           }
         >
           {trendChart.length > 0 ? (
-            <SimpleLineChart data={trendChart} valueFormatter={(value) => `$${value.toFixed(0)}`} />
+            <SimpleLineChart data={trendChart} valueFormatter={(value) => formatCurrency(value)} />
           ) : (
-            <p className="py-10 text-center text-sm text-ink-soft">No settled orders in this window with these filters.</p>
+            <p className="py-10 text-center text-sm text-ink-soft">{t("empty.noRevenueTrend")}</p>
           )}
         </ChartWrapper>
 
-        <ChartWrapper title="Payment mix">
+        <ChartWrapper title={t("charts.paymentMix")}>
           {methodChart.length > 0 ? (
-            <SimplePieChart data={methodChart} valueFormatter={(value) => `$${value.toFixed(0)}`} />
+            <SimplePieChart data={methodChart} valueFormatter={(value) => formatCurrency(value)} />
           ) : (
-            <p className="py-10 text-center text-sm text-ink-soft">Nothing collected in this window yet.</p>
+            <p className="py-10 text-center text-sm text-ink-soft">{t("empty.noPaymentMix")}</p>
           )}
         </ChartWrapper>
       </div>
 
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
-        <ChartWrapper title="Revenue by category">
+        <ChartWrapper title={t("charts.revenueByCategory")}>
           {categoryChart.length > 0 ? (
-            <SimpleBarChart data={categoryChart} horizontalBars valueFormatter={(value) => `$${value.toFixed(0)}`} />
+            <SimpleBarChart data={categoryChart} horizontalBars valueFormatter={(value) => formatCurrency(value)} />
           ) : (
-            <p className="py-10 text-center text-sm text-ink-soft">No category sales to break down yet.</p>
+            <p className="py-10 text-center text-sm text-ink-soft">{t("empty.noCategorySales")}</p>
           )}
         </ChartWrapper>
 
         <Card>
           <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Top sellers</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{t("charts.topSellers")}</p>
             <Link
               to="/admin/reports/product-performance"
               className="flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover"
             >
-              Product performance
+              {t("charts.productPerformance")}
               <ArrowRight className="h-3 w-3 rtl:rotate-180" strokeWidth={2.5} />
             </Link>
           </div>
           {(current?.topProducts.length ?? 0) === 0 ? (
-            <p className="text-sm text-ink-soft">No sales match the current filters.</p>
+            <p className="text-sm text-ink-soft">{t("empty.noTopSellers")}</p>
           ) : (
             <div className="space-y-2">
               {current?.topProducts.map((product, index) => (
@@ -458,7 +510,8 @@ export default function DashboardPage() {
                     <span className="truncate text-ink">{product.name}</span>
                   </span>
                   <span className="flex-none text-xs text-ink-soft">
-                    {product.unitsSold} sold · <span className="font-semibold tabular-nums text-ink">${product.revenue.toFixed(0)}</span>
+                    {t("charts.unitsSold", { count: product.unitsSold })} ·{" "}
+                    <span className="font-semibold tabular-nums text-ink">{formatCurrency(product.revenue)}</span>
                   </span>
                 </div>
               ))}
@@ -469,64 +522,57 @@ export default function DashboardPage() {
       <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div>
           <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">
-            Recent & settled orders {orderSearch ? `· filtered by “${orderSearch}”` : ""}
+            {orderSearch ? t("recentOrders.headingFiltered", { search: orderSearch }) : t("recentOrders.heading")}
           </p>
           <DataTable
             columns={orderColumns}
             data={recentOrders.length === 0 ? [] : filteredOrders}
             keyField={(row) => row.id}
             emptyIcon={Receipt}
-            emptyTitle={orderSearch ? "No orders match that search" : "No orders in this window"}
+            emptyTitle={orderSearch ? t("recentOrders.emptySearchTitle") : t("recentOrders.emptyTitle")}
             emptyDescription={
-              orderSearch
-                ? "Clear the search to see the full recent list."
-                : "Widen the date window or clear the filters to see orders here."
+              orderSearch ? t("recentOrders.emptySearchDescription") : t("recentOrders.emptyDescription")
             }
           />
         </div>
 
         <Card>
           <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Low stock watchlist</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{t("lowStockWatchlist.heading")}</p>
             <Link to="/admin/inventory/stock" className="flex items-center gap-1 text-xs font-semibold text-accent hover:text-accent-hover">
-              Restock
+              {t("lowStockWatchlist.restock")}
               <ArrowRight className="h-3 w-3 rtl:rotate-180" strokeWidth={2.5} />
             </Link>
           </div>
           {lowStock.length === 0 ? (
-            <p className="text-sm text-ink-soft">Everything is above par level.</p>
+            <p className="text-sm text-ink-soft">{t("lowStockWatchlist.empty")}</p>
           ) : (
             <div className="space-y-2">
               {lowStock.slice(0, 8).map((item) => (
                 <div key={item.id} className="flex items-center justify-between gap-2 text-sm">
                   <span className="truncate text-ink">{item.name}</span>
                   <StatusPill
-                    label={`${item.currentStock} ${item.unit}`}
+                    label={`${formatNumber(item.currentStock)} ${item.unit}`}
                     tone={item.currentStock === 0 ? "danger" : "warn"}
                     size="sm"
                   />
                 </div>
               ))}
-              {lowStock.length > 8 && <p className="pt-1 text-xs text-ink-soft">+{lowStock.length - 8} more</p>}
+              {lowStock.length > 8 && <p className="pt-1 text-xs text-ink-soft">{t("lowStockWatchlist.more", { count: lowStock.length - 8 })}</p>}
             </div>
           )}
         </Card>
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          { to: "/admin/reports/sales", label: "Sales", blurb: "Revenue by day and payment mix" },
-          { to: "/admin/reports/margins", label: "Margins", blurb: "Food cost vs revenue per item" },
-          { to: "/admin/reports/wastage", label: "Wastage", blurb: "What's being thrown out" },
-          { to: "/admin/reports/peak-hours", label: "Peak hours", blurb: "When service actually happens" },
-        ].map((link) => (
+        {QUICK_LINKS.map((link) => (
           <Link
             key={link.to}
             to={link.to}
             className="card-hover rounded-xl border border-border bg-surface-raised p-4 shadow-sm"
           >
-            <p className="font-semibold text-ink">{link.label}</p>
-            <p className="mt-1 text-xs text-ink-soft">{link.blurb}</p>
+            <p className="font-semibold text-ink">{t(`quickLinks.${link.key}.label`)}</p>
+            <p className="mt-1 text-xs text-ink-soft">{t(`quickLinks.${link.key}.blurb`)}</p>
           </Link>
         ))}
       </div>

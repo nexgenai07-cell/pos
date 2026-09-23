@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ClipboardList, Pencil, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Category, Recipe } from "@/types";
 import { getCategories, getProducts, type ProductWithCategory } from "@/lib/api/products";
 import { deleteRecipeForProduct, getRecipes } from "@/lib/api/recipes";
@@ -26,7 +27,15 @@ import {
 type RecipeFilter = "all" | "with" | "without";
 type SortKey = "name" | "category" | "ingredients";
 
+const SORT_KEY_LABEL_KEY = {
+  name: "recipesPage.sortProductName",
+  category: "recipesPage.sortCategory",
+  ingredients: "recipesPage.sortMostIngredients",
+} as const satisfies Record<SortKey, string>;
+
 export default function RecipesPage() {
+  const { t } = useTranslation("inventory");
+  const { t: tCommon } = useTranslation("common");
   const [products, setProducts] = useState<ProductWithCategory[] | null>(null);
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -64,11 +73,21 @@ export default function RecipesPage() {
   if (categoryFilter !== "all") {
     chips.push({
       key: "category",
-      label: `Category: ${categories.find((category) => category.id === categoryFilter)?.name ?? categoryFilter}`,
+      label: t("recipesPage.chipCategory", {
+        category: categories.find((category) => category.id === categoryFilter)?.name ?? categoryFilter,
+      }),
     });
   }
-  if (recipeFilter !== "all") chips.push({ key: "recipe", label: `Recipe: ${recipeFilter === "with" ? "costed" : "missing"}` });
-  if (sortKey !== "name") chips.push({ key: "sort", label: `Sorted by ${sortKey}` });
+  if (recipeFilter !== "all") {
+    chips.push({
+      key: "recipe",
+      label: t("recipesPage.chipRecipe", {
+        state: recipeFilter === "with" ? t("recipesPage.chipRecipeCosted") : t("recipesPage.chipRecipeMissing"),
+      }),
+    });
+  }
+  if (sortKey !== "name")
+    chips.push({ key: "sort", label: t("recipesPage.chipSortedBy", { sort: t(SORT_KEY_LABEL_KEY[sortKey]) }) });
 
   function removeChip(key: string) {
     if (key === "category") setCategoryFilter("all");
@@ -109,12 +128,12 @@ export default function RecipesPage() {
   const costedCount = (products ?? []).filter((product) => (recipeFor(product.id)?.items.length ?? 0) > 0).length;
 
   async function handleClearRecipe(product: ProductWithCategory) {
-    if (!window.confirm(`Delete the recipe for "${product.name}"? The product itself stays on the menu.`)) return;
+    if (!window.confirm(t("recipesPage.confirmDelete", { name: product.name }))) return;
     setClearingId(product.id);
     try {
       await deleteRecipeForProduct(product.id);
       refresh();
-      showToast("Recipe deleted", "success");
+      showToast(t("recipesPage.toastDeleted"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -125,7 +144,7 @@ export default function RecipesPage() {
   const columns: DataTableColumn<ProductWithCategory>[] = [
     {
       key: "name",
-      header: "Product",
+      header: t("recipesPage.colProduct"),
       sortable: true,
       accessor: (product) => product.name,
       render: (product) => (
@@ -137,22 +156,22 @@ export default function RecipesPage() {
     },
     {
       key: "category",
-      header: "Category",
+      header: t("recipesPage.colCategory"),
       sortable: true,
       accessor: (product) => product.categoryName,
       render: (product) => <span className="text-ink-soft">{product.categoryName}</span>,
     },
     {
       key: "ingredients",
-      header: "Ingredients",
+      header: t("recipesPage.colIngredients"),
       sortable: true,
       accessor: (product) => recipeFor(product.id)?.items.length ?? 0,
       render: (product) => {
         const recipe = recipeFor(product.id);
         return recipe && recipe.items.length > 0 ? (
-          <StatusPill label={`${recipe.items.length} ingredients`} tone="accent" size="sm" />
+          <StatusPill label={t("recipesPage.ingredientsCount", { count: recipe.items.length })} tone="accent" size="sm" />
         ) : (
-          <StatusPill label="No recipe" tone="warn" size="sm" />
+          <StatusPill label={t("recipesPage.noRecipe")} tone="warn" size="sm" />
         );
       },
     },
@@ -167,7 +186,7 @@ export default function RecipesPage() {
             <Link to={`/admin/inventory/recipes/${product.id}`}>
               <Button variant="secondary" size="sm">
                 <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
-                {hasRecipe ? "Edit recipe" : "Add recipe"}
+                {hasRecipe ? t("recipesPage.editRecipe") : t("recipesPage.addRecipe")}
               </Button>
             </Link>
             <Button
@@ -176,10 +195,10 @@ export default function RecipesPage() {
               onClick={() => handleClearRecipe(product)}
               loading={clearingId === product.id}
               disabled={!hasRecipe}
-              title={hasRecipe ? "Delete this recipe" : "Nothing to delete"}
+              title={hasRecipe ? t("recipesPage.deleteEnabledTitle") : t("recipesPage.deleteDisabledTitle")}
             >
               <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-              Delete
+              {tCommon("actions.delete")}
             </Button>
           </div>
         );
@@ -190,22 +209,22 @@ export default function RecipesPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Inventory"
-        title="Recipes"
-        description="See which products have a costed recipe and edit the ingredient quantities behind them."
+        eyebrow={t("recipesPage.eyebrow")}
+        title={t("recipesPage.title")}
+        description={t("recipesPage.description")}
         actions={
           <>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search products…" className="w-52" />
+            <SearchInput value={search} onChange={setSearch} placeholder={t("recipesPage.searchPlaceholder")} className="w-52" />
             <FilterToggleButton open={open} onToggle={toggle} activeCount={activeCount} />
           </>
         }
       />
 
-      <FilterPanel open={open} title="Filter recipes" onReset={activeCount > 0 ? resetFilters : undefined}>
+      <FilterPanel open={open} title={t("recipesPage.filterTitle")} onReset={activeCount > 0 ? resetFilters : undefined}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <FilterField label="Category" htmlFor="recipe-category">
+          <FilterField label={t("recipesPage.categoryLabel")} htmlFor="recipe-category">
             <Select id="recipe-category" value={categoryFilter} onChange={(event) => setCategoryFilter(event.target.value)}>
-              <option value="all">All categories</option>
+              <option value="all">{t("recipesPage.allCategories")}</option>
               {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
@@ -214,29 +233,29 @@ export default function RecipesPage() {
             </Select>
           </FilterField>
 
-          <FilterField label="Recipe" htmlFor="recipe-status">
+          <FilterField label={t("recipesPage.recipeLabel")} htmlFor="recipe-status">
             <Select
               id="recipe-status"
               value={recipeFilter}
               onChange={(event) => setRecipeFilter(event.target.value as RecipeFilter)}
             >
-              <option value="all">Any</option>
-              <option value="with">Has recipe</option>
-              <option value="without">Missing recipe</option>
+              <option value="all">{t("recipesPage.anyRecipe")}</option>
+              <option value="with">{t("recipesPage.hasRecipe")}</option>
+              <option value="without">{t("recipesPage.missingRecipe")}</option>
             </Select>
           </FilterField>
 
-          <FilterField label="Sort by" htmlFor="recipe-sort">
+          <FilterField label={t("recipesPage.sortByLabel")} htmlFor="recipe-sort">
             <Select id="recipe-sort" value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)}>
-              <option value="name">Product name</option>
-              <option value="category">Category</option>
-              <option value="ingredients">Most ingredients</option>
+              <option value="name">{t("recipesPage.sortProductName")}</option>
+              <option value="category">{t("recipesPage.sortCategory")}</option>
+              <option value="ingredients">{t("recipesPage.sortMostIngredients")}</option>
             </Select>
           </FilterField>
 
-          <FilterField label="Costing coverage">
+          <FilterField label={t("recipesPage.costingCoverageLabel")}>
             <p className="rounded-lg border border-border bg-surface-sunken px-3 py-2 text-sm text-ink-soft">
-              {costedCount} of {products?.length ?? 0} products costed
+              {t("recipesPage.costingCoverageSummary", { costed: costedCount, total: products?.length ?? 0 })}
             </p>
           </FilterField>
         </div>
@@ -248,17 +267,15 @@ export default function RecipesPage() {
         data={filtered}
         keyField={(product) => product.id}
         emptyIcon={ClipboardList}
-        emptyTitle={search || activeCount > 0 ? "No products match" : "No products yet"}
+        emptyTitle={search || activeCount > 0 ? t("recipesPage.emptyFilteredTitle") : t("recipesPage.emptyTitle")}
         emptyDescription={
           search || activeCount > 0
-            ? "Try a different search or clear the filters."
-            : "Products added to the menu will appear here."
+            ? t("recipesPage.emptyFilteredDescription")
+            : t("recipesPage.emptyDescription")
         }
       />
 
-      <p className="mt-3 text-xs text-ink-soft">
-        Recipes decide what stock is deducted when an item is fired to the kitchen. Delete a recipe to stop deducting without touching the menu item.
-      </p>
+      <p className="mt-3 text-xs text-ink-soft">{t("recipesPage.footerNote")}</p>
     </AdminShell>
   );
 }

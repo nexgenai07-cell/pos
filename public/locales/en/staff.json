@@ -1,0 +1,67 @@
+{
+  "eyebrow": "Staff",
+  "cantRemoveSelf": "You can't remove your own account",
+  "confirmDelete": "Remove \"{{name}}\" from staff? This can't be undone.",
+  "toastRemoved": "Staff member removed",
+  "backToTeam": "Back to team",
+
+  "list": {
+    "title": "Team",
+    "description": "Everyone with an account on this branch.",
+    "searchPlaceholder": "Search by name…",
+    "newStaffMember": "New staff member",
+    "roleAccessTitle": "What each role can access",
+    "filterTitle": "Filter team",
+    "roleLabel": "Role",
+    "allRoles": "All roles",
+    "sortBy": "Sort by",
+    "sortName": "Name",
+    "sortRole": "Role",
+    "showing": "Showing",
+    "summary": "{{shown}} of {{total}} team members shown",
+    "chipRole": "Role: {{role}}",
+    "chipSortedByRole": "Sorted by role",
+    "colName": "Name",
+    "colRole": "Role",
+    "view": "View",
+    "emptyFilteredTitle": "No staff match",
+    "emptyFilteredDescription": "Try a different search or clear the filters.",
+    "emptyTitle": "No staff yet",
+    "emptyDescription": "Add your first team member to get started."
+  },
+
+  "form": {
+    "name": "Name",
+    "role": "Role",
+    "pin": "PIN",
+    "pinError": "PIN must be at least 4 digits",
+    "pinHint": "4 digits, used for POS login"
+  },
+
+  "new": {
+    "title": "New staff member",
+    "description": "Create a login for a new team member.",
+    "submit": "Save staff member",
+    "toastAdded": "Staff member added"
+  },
+
+  "edit": {
+    "title": "Edit staff member",
+    "backToStaffMember": "Back to staff member",
+    "toastUpdated": "Staff member updated"
+  },
+
+  "detail": {
+    "fallbackTitle": "Staff member",
+    "onShift": "On shift",
+    "clockIn": "Clock in",
+    "clockOut": "Clock out",
+    "toastClockedIn": "Clocked in",
+    "toastClockedOut": "Clocked out",
+    "colClockIn": "Clocked in",
+    "colClockOut": "Clocked out",
+    "colDuration": "Duration",
+    "emptyTitle": "No shifts logged yet",
+    "emptyDescription": "Clock in to start tracking hours."
+  }
+}

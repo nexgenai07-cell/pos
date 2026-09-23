@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Plus, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { InventoryItem, Supplier } from "@/types";
 import { getInventoryItems } from "@/lib/api/inventory";
 import { getSuppliers } from "@/lib/api/suppliers";
@@ -22,6 +23,8 @@ interface Line {
 }
 
 export default function NewPurchasePage() {
+  const { t } = useTranslation("inventory");
+  const { t: tCommon } = useTranslation("common");
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [inventoryItems, setInventoryItems] = useState<InventoryItem[]>([]);
   const [supplierId, setSupplierId] = useState("");
@@ -66,21 +69,21 @@ export default function NewPurchasePage() {
 
     setSaving(true);
     await createPurchase({ supplierId, items });
-    showToast("Purchase order created", "success");
+    showToast(t("newPurchasePage.toastCreated"), "success");
     navigate("/admin/inventory/purchases");
   }
 
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Inventory · Purchases"
-        title="New purchase order"
-        description="Order ingredients from a supplier."
-        actions={<BackLink to="/admin/inventory/purchases" label="Back to purchases" />}
+        eyebrow={t("newPurchasePage.eyebrow")}
+        title={t("newPurchasePage.title")}
+        description={t("newPurchasePage.description")}
+        actions={<BackLink to="/admin/inventory/purchases" label={t("purchaseForm.backToPurchases")} />}
       />
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
-        <FormField label="Supplier" htmlFor="supplier">
+        <FormField label={t("purchaseForm.supplierLabel")} htmlFor="supplier">
           <Select id="supplier" value={supplierId} onChange={(event) => setSupplierId(event.target.value)} className="max-w-sm">
             {suppliers.map((supplier) => (
               <option key={supplier.id} value={supplier.id}>
@@ -91,7 +94,7 @@ export default function NewPurchasePage() {
         </FormField>
 
         <Card>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">Line items</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">{t("purchaseForm.lineItemsLabel")}</p>
           <div className="space-y-2.5">
             {lines.map((line, index) => (
               <div key={index} className="flex flex-wrap items-center gap-2">
@@ -102,14 +105,14 @@ export default function NewPurchasePage() {
                 >
                   {inventoryItems.map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.name} ({item.unit})
+                      {t("purchaseForm.itemUnitFormat", { name: item.name, unit: item.unit })}
                     </option>
                   ))}
                 </Select>
                 <Input
                   type="number"
                   min="0"
-                  placeholder="quantity"
+                  placeholder={t("purchaseForm.quantityPlaceholder")}
                   value={line.quantity}
                   onChange={(event) => updateLine(index, { quantity: event.target.value })}
                   className="w-24 py-1.5!"
@@ -118,7 +121,7 @@ export default function NewPurchasePage() {
                   type="number"
                   min="0"
                   step="0.01"
-                  placeholder="unit cost"
+                  placeholder={t("purchaseForm.unitCostPlaceholder")}
                   value={line.unitCost}
                   onChange={(event) => updateLine(index, { unitCost: event.target.value })}
                   className="w-24 py-1.5!"
@@ -127,7 +130,7 @@ export default function NewPurchasePage() {
                   <button
                     type="button"
                     onClick={() => removeLine(index)}
-                    aria-label="Remove line"
+                    aria-label={t("purchaseForm.removeLineAria")}
                     className="flex h-8 w-8 flex-none items-center justify-center rounded-lg text-ink-soft transition-colors hover:bg-status-danger/10 hover:text-status-danger"
                   >
                     <X className="h-4 w-4" strokeWidth={2} />
@@ -142,16 +145,16 @@ export default function NewPurchasePage() {
             className="mt-3 flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-hover"
           >
             <Plus className="h-3.5 w-3.5" strokeWidth={2.25} />
-            Add line
+            {t("purchaseForm.addLine")}
           </button>
         </Card>
 
         <div className="flex items-center gap-3">
           <Button type="submit" loading={saving}>
-            Create purchase order
+            {t("newPurchasePage.submitButton")}
           </Button>
           <Button type="button" variant="secondary" onClick={() => navigate("/admin/inventory/purchases")} disabled={saving}>
-            Cancel
+            {tCommon("actions.cancel")}
           </Button>
         </div>
       </form>

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { StockMovement } from "@/types";
 import { getWastage, type WastageRow } from "@/lib/api/reports";
 import { getInventoryItems } from "@/lib/api/inventory";
 import type { InventoryItem } from "@/types";
 import { exportToCsv } from "@/lib/csv";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatCurrency, formatNumber } from "@/lib/format";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
 import KpiTile from "@/components/reports/KpiTile";
@@ -16,6 +17,7 @@ import Card from "@/components/ui/Card";
 import { ReportDateFilterButton, ReportDateFilterPanel, useReportDateRange } from "@/components/reports/ReportDateFilter";
 
 export default function WastagePage() {
+  const { t } = useTranslation("reports");
   const dateRange = useReportDateRange("report-wastage-filters");
   const [rows, setRows] = useState<WastageRow[]>([]);
   const [totalCost, setTotalCost] = useState(0);
@@ -47,8 +49,8 @@ export default function WastagePage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Reports"
-        title="Wastage"
+        eyebrow={t("page.wastage.eyebrow")}
+        title={t("page.wastage.title")}
         actions={
           <>
             <ReportDateFilterButton state={dateRange} />
@@ -61,17 +63,17 @@ export default function WastagePage() {
       <ReportDateFilterPanel state={dateRange} idPrefix="wastage" />
 
       <div className="mb-5 mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <KpiTile label="Total waste cost" value={`$${totalCost.toFixed(2)}`} />
-        <KpiTile label="Waste events logged" value={String(totalEvents)} />
+        <KpiTile label={t("kpi.wastage.wasteValue.title")} sub={t("kpi.wastage.wasteValue.sub")} value={formatCurrency(totalCost)} />
+        <KpiTile label={t("kpi.wastage.wasteOrders.title")} sub={t("kpi.wastage.wasteOrders.sub")} value={formatNumber(totalEvents)} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <ChartWrapper title="Waste cost by ingredient">
-          <SimpleBarChart data={chartData} valueFormatter={(value) => `$${value.toFixed(2)}`} horizontalBars />
+        <ChartWrapper title={t("charts.wasteCostByIngredient")}>
+          <SimpleBarChart data={chartData} valueFormatter={(value) => formatCurrency(value)} horizontalBars />
         </ChartWrapper>
 
         <Card>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">Recent waste log</p>
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-ink-soft">{t("page.wastage.recentLogHeading")}</p>
           <div className="space-y-1.5 text-sm">
             {recent.map((movement) => {
               const item = items.find((entry) => entry.id === movement.inventoryItemId);
@@ -79,7 +81,7 @@ export default function WastagePage() {
                 <div key={movement.id} className="flex items-center justify-between text-ink-soft">
                   <span>{item?.name ?? movement.inventoryItemId}</span>
                   <span className="tabular-nums text-ink">
-                    {Math.abs(movement.quantityDelta)} {item?.unit} · {formatDate(movement.createdAt)}
+                    {formatNumber(Math.abs(movement.quantityDelta))} {item?.unit} · {formatDate(movement.createdAt)}
                   </span>
                 </div>
               );

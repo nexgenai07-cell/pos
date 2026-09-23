@@ -22,7 +22,8 @@ export default function DealsPage() {
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { showToast } = useToast();
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("menu");
+  const { t: tCommon } = useTranslation("common");
 
   const refresh = useCallback(() => {
     getDeals().then(setDeals);
@@ -39,12 +40,12 @@ export default function DealsPage() {
   }, [deals, search]);
 
   async function handleRemove(deal: DealRow) {
-    if (!window.confirm(`Remove the deal on "${deal.name}"? It goes back to its regular price.`)) return;
+    if (!window.confirm(t("dealsPage.removeConfirm", { name: deal.name }))) return;
     setDeletingId(deal.id);
     try {
       await removeProductDeal(deal.id);
       refresh();
-      showToast("Deal removed", "success");
+      showToast(t("dealsPage.toastRemoved"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -55,7 +56,7 @@ export default function DealsPage() {
   const columns: DataTableColumn<DealRow>[] = [
     {
       key: "name",
-      header: "Product",
+      header: t("columns.name"),
       sortable: true,
       accessor: (row) => row.name,
       render: (row) => (
@@ -70,7 +71,7 @@ export default function DealsPage() {
     },
     {
       key: "regularPrice",
-      header: "Regular price",
+      header: t("columns.regularPrice"),
       sortable: true,
       align: "right",
       accessor: (row) => row.price,
@@ -78,7 +79,7 @@ export default function DealsPage() {
     },
     {
       key: "dealPrice",
-      header: "Deal price",
+      header: t("columns.dealPrice"),
       sortable: true,
       align: "right",
       accessor: (row) => row.deal.price,
@@ -86,17 +87,17 @@ export default function DealsPage() {
     },
     {
       key: "schedule",
-      header: "Schedule",
-      accessor: (row) => describeDealLabel(t, row.deal),
-      render: (row) => <span className="text-xs text-ink-soft">{describeDealLabel(t, row.deal)}</span>,
+      header: t("columns.dealSchedule"),
+      accessor: (row) => describeDealLabel(tCommon, row.deal),
+      render: (row) => <span className="text-xs text-ink-soft">{describeDealLabel(tCommon, row.deal)}</span>,
     },
     {
       key: "active",
-      header: "Right now",
+      header: t("columns.rightNow"),
       accessor: (row) => (activeDealPrice(row.deal) !== undefined ? 1 : 0),
       render: (row) => (
         <StatusPill
-          label={activeDealPrice(row.deal) !== undefined ? "Active" : "Not active"}
+          label={activeDealPrice(row.deal) !== undefined ? t("dealsPage.active") : t("dealsPage.notActive")}
           tone={activeDealPrice(row.deal) !== undefined ? "good" : "neutral"}
           size="sm"
         />
@@ -111,7 +112,7 @@ export default function DealsPage() {
           <Link to={`/admin/menu/deals/${row.id}/edit`}>
             <Button variant="secondary" size="sm">
               <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
-              Edit
+              {tCommon("actions.edit")}
             </Button>
           </Link>
           <Button
@@ -119,10 +120,10 @@ export default function DealsPage() {
             size="sm"
             onClick={() => handleRemove(row)}
             loading={deletingId === row.id}
-            title="Remove this deal"
+            title={t("dealsPage.removeTitle")}
           >
             <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-            Remove
+            {t("dealsPage.removeButton")}
           </Button>
         </div>
       ),
@@ -132,17 +133,17 @@ export default function DealsPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Menu · Deals"
-        title="Deals"
-        description="Limited-time special prices, active only during specific day+time windows. Everything else keeps its regular price."
+        eyebrow={t("page.deals.eyebrow")}
+        title={t("page.deals.title")}
+        description={t("page.deals.description")}
         actions={
           <>
             <Link to="/admin/menu" className="text-sm font-medium text-accent hover:text-accent-hover">
-              ← Back to menu
+              ← {t("dealsPage.back")}
             </Link>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search deals…" className="w-52" />
+            <SearchInput value={search} onChange={setSearch} placeholder={t("dealsPage.searchPlaceholder")} className="w-52" />
             <Link to="/admin/menu/deals/new">
-              <Button>New deal</Button>
+              <Button>{t("dealFormPage.titleNew")}</Button>
             </Link>
           </>
         }
@@ -153,14 +154,12 @@ export default function DealsPage() {
         data={filtered}
         keyField={(row) => row.id}
         emptyIcon={Percent}
-        emptyTitle={search ? "No deals match" : "No deals yet"}
-        emptyDescription={
-          search ? "Try a different search." : "Set up a limited-time special price for a menu item to see it here."
-        }
+        emptyTitle={search ? t("dealsPage.emptyFilteredTitle") : t("dealsPage.emptyTitle")}
+        emptyDescription={search ? t("dealsPage.emptyFilteredDescription") : t("dealsPage.emptyDescription")}
         emptyAction={
           !search && (
             <Link to="/admin/menu/deals/new">
-              <Button size="sm">New deal</Button>
+              <Button size="sm">{t("dealFormPage.titleNew")}</Button>
             </Link>
           )
         }

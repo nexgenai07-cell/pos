@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Boxes, Download, Pencil, Trash2, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { InventoryItem, Supplier } from "@/types";
 import {
   adjustStock,
@@ -12,6 +13,7 @@ import { getRecipes } from "@/lib/api/recipes";
 import { getSuppliers } from "@/lib/api/suppliers";
 import { on } from "@/lib/eventBus";
 import { exportToCsv } from "@/lib/csv";
+import { formatCurrency, formatNumber } from "@/lib/format";
 import { countActiveFilters, matchesSearch, uniqueSorted } from "@/lib/filters";
 import { errorMessage } from "@/lib/errors";
 import { useToast } from "@/components/ui/Toast";
@@ -37,6 +39,19 @@ import {
 type StockStatus = "all" | "low" | "ok" | "out";
 type SortKey = "name" | "stock" | "par" | "value";
 
+const STOCK_STATUS_LABEL_KEY = {
+  low: "stockPage.atOrBelowPar",
+  out: "stockPage.outOfStock",
+  ok: "stockPage.healthy",
+} as const satisfies Record<Exclude<StockStatus, "all">, string>;
+
+const SORT_KEY_LABEL_KEY = {
+  name: "stockPage.sortName",
+  stock: "stockPage.sortLowestOnHand",
+  par: "stockPage.sortHighestPar",
+  value: "stockPage.sortValue",
+} as const satisfies Record<SortKey, string>;
+
 interface Draft {
   name: string;
   unit: string;
@@ -55,6 +70,8 @@ function statusOf(item: InventoryItem): Exclude<StockStatus, "all"> {
 }
 
 export default function StockPage() {
+  const { t } = useTranslation("inventory");
+  const { t: tCommon } = useTranslation("common");
   const [items, setItems] = useState<InventoryItem[] | null>(null);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [recipeUsage, setRecipeUsage] = useState<Map<string, number>>(new Map());
@@ -105,16 +122,18 @@ export default function StockPage() {
   if (supplierFilter !== "all") {
     chips.push({
       key: "supplier",
-      label: `Supplier: ${
-        supplierFilter === "none"
-          ? "unassigned"
-          : suppliers.find((supplier) => supplier.id === supplierFilter)?.name ?? supplierFilter
-      }`,
+      label: t("stockPage.chipSupplier", {
+        name:
+          supplierFilter === "none"
+            ? t("stockPage.chipSupplierUnassigned")
+            : suppliers.find((supplier) => supplier.id === supplierFilter)?.name ?? supplierFilter,
+      }),
     });
   }
-  if (statusFilter !== "all") chips.push({ key: "status", label: `Stock: ${statusFilter}` });
-  if (unitFilter !== "all") chips.push({ key: "unit", label: `Unit: ${unitFilter}` });
-  if (sortKey !== "name") chips.push({ key: "sort", label: `Sorted by ${sortKey}` });
+  if (statusFilter !== "all")
+    chips.push({ key: "status", label: t("stockPage.chipStatus", { status: t(STOCK_STATUS_LABEL_KEY[statusFilter]) }) });
+  if (unitFilter !== "all") chips.push({ key: "unit", label: t("stockPage.chipUnit", { unit: unitFilter }) });
+  if (sortKey !== "name") chips.push({ key: "sort", label: t("stockPage.chipSortedBy", { sort: t(SORT_KEY_LABEL_KEY[sortKey]) }) });
 
   function removeChip(key: string) {
     if (key === "supplier") setSupplierFilter("all");
@@ -191,10 +210,10 @@ export default function StockPage() {
 
       if (editorMode === "edit" && editingId) {
         await updateInventoryItem(editingId, payload);
-        showToast("Ingredient updated", "success");
+        showToast(t("stockPage.toastUpdated"), "success");
       } else {
         await createInventoryItem(payload);
-        showToast("Ingredient added", "success");
+        showToast(t("stockPage.toastAdded"), "success");
       }
       closeEditor();
       refresh();
@@ -206,12 +225,12 @@ export default function StockPage() {
   }
 
   async function handleDelete(item: InventoryItem) {
-    if (!window.confirm(`Delete "${item.name}" from tracked ingredients?`)) return;
+    if (!window.confirm(t("stockPage.confirmDelete", { name: item.name }))) return;
     setDeletingId(item.id);
     try {
       await deleteInventoryItem(item.id);
       refresh();
-      showToast("Ingredient deleted", "success");
+      showToast(t("stockPage.toastDeleted"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -225,7 +244,7 @@ export default function StockPage() {
     await adjustStock(itemId, -quantity, "waste");
     setWasteInputs((current) => ({ ...current, [itemId]: "" }));
     refresh();
-    showToast("Waste logged", "success");
+    showToast(t("stockPage.toastWasteLogged"), "success");
   }
 
   function handleExport() {
@@ -242,21 +261,23 @@ export default function StockPage() {
   const columns: DataTableColumn<InventoryItem>[] = [
     {
       key: "name",
-      header: "Ingredient",
+      header: t("stockPage.colIngredient"),
       sortable: true,
       accessor: (item) => item.name,
       render: (item) => (
         <div>
           <p className="font-medium text-ink">{item.name}</p>
           <p className="text-xs text-ink-soft">
-            {recipeUsage.get(item.id) ? `used in ${recipeUsage.get(item.id)} recipe${recipeUsage.get(item.id) === 1 ? "" : "s"}` : "no recipe"}
+            {recipeUsage.get(item.id)
+              ? t("stockPage.usedInRecipes", { count: recipeUsage.get(item.id) })
+              : t("stockPage.noRecipe")}
           </p>
         </div>
       ),
     },
     {
       key: "supplier",
-      header: "Supplier",
+      header: t("stockPage.colSupplier"),
       sortable: true,
       accessor: (item) => suppliers.find((supplier) => supplier.id === item.supplierId)?.name ?? "",
       render: (item) => (
@@ -267,46 +288,46 @@ export default function StockPage() {
     },
     {
       key: "stock",
-      header: "On hand",
+      header: t("stockPage.colOnHand"),
       sortable: true,
       align: "right",
       accessor: (item) => item.currentStock,
       render: (item) => (
         <span className="tabular-nums text-ink">
-          {item.currentStock} {item.unit}
+          {formatNumber(item.currentStock)} {item.unit}
         </span>
       ),
     },
     {
       key: "parLevel",
-      header: "Par level",
+      header: t("stockPage.colParLevel"),
       sortable: true,
       align: "right",
       accessor: (item) => item.parLevel,
       render: (item) => (
         <span className="tabular-nums text-ink-soft">
-          {item.parLevel} {item.unit}
+          {formatNumber(item.parLevel)} {item.unit}
         </span>
       ),
     },
     {
       key: "cost",
-      header: "Cost / unit",
+      header: t("stockPage.colCostPerUnit"),
       sortable: true,
       align: "right",
       accessor: (item) => item.costPerUnit,
-      render: (item) => <span className="tabular-nums text-ink-soft">${item.costPerUnit.toFixed(3)}</span>,
+      render: (item) => <span className="tabular-nums text-ink-soft">{formatCurrency(item.costPerUnit)}</span>,
     },
     {
       key: "status",
-      header: "Status",
+      header: t("stockPage.colStatus"),
       sortable: true,
       accessor: (item) => (item.currentStock <= item.parLevel ? 0 : 1),
       render: (item) => {
         const status = statusOf(item);
         return (
           <StatusPill
-            label={status === "out" ? "Out of stock" : status === "low" ? "Low stock" : "OK"}
+            label={status === "out" ? t("stockPage.statusOut") : status === "low" ? t("stockPage.statusLow") : t("stockPage.statusOk")}
             tone={status === "out" ? "danger" : status === "low" ? "warn" : "good"}
             size="sm"
           />
@@ -315,19 +336,19 @@ export default function StockPage() {
     },
     {
       key: "waste",
-      header: "Log waste",
+      header: t("stockPage.colLogWaste"),
       render: (item) => (
         <div className="flex items-center gap-1.5">
           <Input
             type="number"
             min="0"
-            placeholder="qty"
+            placeholder={t("stockPage.wastePlaceholder")}
             value={wasteInputs[item.id] ?? ""}
             onChange={(event) => setWasteInputs((current) => ({ ...current, [item.id]: event.target.value }))}
             className="w-16 py-1! text-xs"
           />
           <Button variant="secondary" size="sm" onClick={() => handleLogWaste(item.id)}>
-            Log
+            {t("stockPage.logButton")}
           </Button>
         </div>
       ),
@@ -340,7 +361,7 @@ export default function StockPage() {
         <div className="flex items-center justify-end gap-1.5">
           <Button variant="secondary" size="sm" onClick={() => openEdit(item)}>
             <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
-            Edit
+            {tCommon("actions.edit")}
           </Button>
           <Button
             variant="danger"
@@ -348,10 +369,10 @@ export default function StockPage() {
             onClick={() => handleDelete(item)}
             loading={deletingId === item.id}
             disabled={recipeUsage.has(item.id)}
-            title={recipeUsage.has(item.id) ? "Used by a recipe — remove it there first" : "Delete ingredient"}
+            title={recipeUsage.has(item.id) ? t("stockPage.deleteDisabledTitle") : t("stockPage.deleteEnabledTitle")}
           >
             <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-            Delete
+            {tCommon("actions.delete")}
           </Button>
         </div>
       ),
@@ -359,51 +380,50 @@ export default function StockPage() {
   ];
 
   const editing = editorMode !== "closed";
-  const editorTitle = editorMode === "edit" ? "Edit ingredient" : "New ingredient";
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Inventory"
-        title="Stock levels"
-        description="Add ingredients, set par levels, and log waste as it happens."
+        eyebrow={t("stockPage.eyebrow")}
+        title={t("stockPage.title")}
+        description={t("stockPage.description")}
         actions={
           <>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search ingredients…" className="w-52" />
+            <SearchInput value={search} onChange={setSearch} placeholder={t("stockPage.searchPlaceholder")} className="w-52" />
             <FilterToggleButton open={open} onToggle={toggle} activeCount={activeCount} />
-            <Button variant="secondary" onClick={handleExport} title="Export the filtered list">
+            <Button variant="secondary" onClick={handleExport} title={t("stockPage.exportTitle")}>
               <Download className="h-3.5 w-3.5" strokeWidth={2} />
-              CSV
+              {t("stockPage.exportButton")}
             </Button>
-            <Button onClick={editing ? closeEditor : openNew}>{editing ? "Close form" : "New ingredient"}</Button>
+            <Button onClick={editing ? closeEditor : openNew}>{editing ? t("stockPage.closeForm") : t("stockPage.newIngredient")}</Button>
           </>
         }
       />
 
       <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         <div className="rounded-xl border border-border bg-surface-raised p-3 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">Tracked ingredients</p>
-          <p className="mt-1 text-xl font-bold tabular-nums text-ink">{items?.length ?? 0}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">{t("stockPage.statTracked")}</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-ink">{formatNumber(items?.length ?? 0)}</p>
         </div>
         <div className="rounded-xl border border-status-warn/30 bg-status-warn/10 p-3 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-status-warn">Low or out</p>
-          <p className="mt-1 text-xl font-bold tabular-nums text-status-warn">{lowStockCount}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-status-warn">{t("stockPage.statLowOrOut")}</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-status-warn">{formatNumber(lowStockCount)}</p>
         </div>
         <div className="rounded-xl border border-border bg-surface-raised p-3 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">Stock value</p>
-          <p className="mt-1 text-xl font-bold tabular-nums text-ink">${stockValue.toFixed(2)}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">{t("stockPage.statStockValue")}</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-ink">{formatCurrency(stockValue)}</p>
         </div>
         <div className="rounded-xl border border-border bg-surface-raised p-3 shadow-sm">
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">Showing</p>
-          <p className="mt-1 text-xl font-bold tabular-nums text-ink">{filtered?.length ?? 0}</p>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-soft">{t("stockPage.statShowing")}</p>
+          <p className="mt-1 text-xl font-bold tabular-nums text-ink">{formatNumber(filtered?.length ?? 0)}</p>
         </div>
       </div>
 
-      <FilterPanel open={open} title="Filter stock" onReset={activeCount > 0 ? resetFilters : undefined}>
+      <FilterPanel open={open} title={t("stockPage.filterTitle")} onReset={activeCount > 0 ? resetFilters : undefined}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <FilterField label="Supplier" htmlFor="stock-supplier">
+          <FilterField label={t("stockPage.supplierLabel")} htmlFor="stock-supplier">
             <Select id="stock-supplier" value={supplierFilter} onChange={(event) => setSupplierFilter(event.target.value)}>
-              <option value="all">All suppliers</option>
-              <option value="none">No supplier assigned</option>
+              <option value="all">{t("stockPage.allSuppliers")}</option>
+              <option value="none">{t("stockPage.noSupplierAssigned")}</option>
               {suppliers.map((supplier) => (
                 <option key={supplier.id} value={supplier.id}>
                   {supplier.name}
@@ -412,18 +432,18 @@ export default function StockPage() {
             </Select>
           </FilterField>
 
-          <FilterField label="Stock status" htmlFor="stock-status">
+          <FilterField label={t("stockPage.stockStatusLabel")} htmlFor="stock-status">
             <Select id="stock-status" value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as StockStatus)}>
-              <option value="all">Any level</option>
-              <option value="low">At or below par</option>
-              <option value="out">Out of stock</option>
-              <option value="ok">Healthy</option>
+              <option value="all">{t("stockPage.anyLevel")}</option>
+              <option value="low">{t("stockPage.atOrBelowPar")}</option>
+              <option value="out">{t("stockPage.outOfStock")}</option>
+              <option value="ok">{t("stockPage.healthy")}</option>
             </Select>
           </FilterField>
 
-          <FilterField label="Unit" htmlFor="stock-unit">
+          <FilterField label={t("stockPage.unitLabel")} htmlFor="stock-unit">
             <Select id="stock-unit" value={unitFilter} onChange={(event) => setUnitFilter(event.target.value)}>
-              <option value="all">Any unit</option>
+              <option value="all">{t("stockPage.anyUnit")}</option>
               {units.map((unit) => (
                 <option key={unit} value={unit}>
                   {unit}
@@ -432,12 +452,12 @@ export default function StockPage() {
             </Select>
           </FilterField>
 
-          <FilterField label="Sort by" htmlFor="stock-sort">
+          <FilterField label={t("stockPage.sortByLabel")} htmlFor="stock-sort">
             <Select id="stock-sort" value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)}>
-              <option value="name">Name</option>
-              <option value="stock">Lowest on hand</option>
-              <option value="par">Highest par</option>
-              <option value="value">Stock value</option>
+              <option value="name">{t("stockPage.sortName")}</option>
+              <option value="stock">{t("stockPage.sortLowestOnHand")}</option>
+              <option value="par">{t("stockPage.sortHighestPar")}</option>
+              <option value="value">{t("stockPage.sortValue")}</option>
             </Select>
           </FilterField>
         </div>
@@ -447,11 +467,13 @@ export default function StockPage() {
       {editing && (
         <Card className="mt-4 border-accent/30 shadow-md" padding="lg">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-accent-strong">{editorTitle}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-accent-strong">
+              {editorMode === "edit" ? t("stockPage.editorTitleEdit") : t("stockPage.editorTitleNew")}
+            </p>
             <button
               type="button"
               onClick={closeEditor}
-              aria-label="Close form"
+              aria-label={t("stockPage.closeFormAria")}
               className="rounded-md p-1 text-ink-soft transition-colors hover:bg-surface-sunken hover:text-ink"
             >
               <X className="h-4 w-4" strokeWidth={2} />
@@ -460,7 +482,7 @@ export default function StockPage() {
 
           <form onSubmit={saveEditor} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <FormField label="Name" htmlFor="stock-name" required>
+              <FormField label={t("stockPage.fieldName")} htmlFor="stock-name" required>
                 <Input
                   id="stock-name"
                   value={draft.name}
@@ -469,7 +491,7 @@ export default function StockPage() {
                 />
               </FormField>
 
-              <FormField label="Unit" htmlFor="stock-unit-field" hint="unit, g, ml, slice…">
+              <FormField label={t("stockPage.fieldUnit")} htmlFor="stock-unit-field" hint={t("stockPage.fieldUnitHint")}>
                 <Input
                   id="stock-unit-field"
                   value={draft.unit}
@@ -477,13 +499,13 @@ export default function StockPage() {
                 />
               </FormField>
 
-              <FormField label="Supplier" htmlFor="stock-supplier-field">
+              <FormField label={t("stockPage.fieldSupplier")} htmlFor="stock-supplier-field">
                 <Select
                   id="stock-supplier-field"
                   value={draft.supplierId}
                   onChange={(event) => setDraft((current) => ({ ...current, supplierId: event.target.value }))}
                 >
-                  <option value="">Not assigned</option>
+                  <option value="">{t("stockPage.notAssigned")}</option>
                   {suppliers.map((supplier) => (
                     <option key={supplier.id} value={supplier.id}>
                       {supplier.name}
@@ -492,7 +514,7 @@ export default function StockPage() {
                 </Select>
               </FormField>
 
-              <FormField label="Par level" htmlFor="stock-par" hint="Reorder alert threshold">
+              <FormField label={t("stockPage.fieldParLevel")} htmlFor="stock-par" hint={t("stockPage.fieldParLevelHint")}>
                 <Input
                   id="stock-par"
                   type="number"
@@ -503,7 +525,7 @@ export default function StockPage() {
                 />
               </FormField>
 
-              <FormField label="Cost per unit" htmlFor="stock-cost">
+              <FormField label={t("stockPage.fieldCostPerUnit")} htmlFor="stock-cost">
                 <Input
                   id="stock-cost"
                   type="number"
@@ -514,7 +536,7 @@ export default function StockPage() {
                 />
               </FormField>
 
-              <FormField label="On hand" htmlFor="stock-onhand" hint="Opening quantity / correction">
+              <FormField label={t("stockPage.fieldOnHand")} htmlFor="stock-onhand" hint={t("stockPage.fieldOnHandHint")}>
                 <Input
                   id="stock-onhand"
                   type="number"
@@ -528,10 +550,10 @@ export default function StockPage() {
 
             <div className="flex items-center gap-3">
               <Button type="submit" loading={saving}>
-                {editorMode === "edit" ? "Save changes" : "Add ingredient"}
+                {editorMode === "edit" ? tCommon("actions.saveChanges") : t("stockPage.addIngredientButton")}
               </Button>
               <Button type="button" variant="secondary" onClick={closeEditor} disabled={saving}>
-                Cancel
+                {tCommon("actions.cancel")}
               </Button>
             </div>
           </form>
@@ -544,17 +566,17 @@ export default function StockPage() {
           data={filtered}
           keyField={(item) => item.id}
           emptyIcon={Boxes}
-          emptyTitle={search || activeCount > 0 ? "No ingredients match" : "No stock items yet"}
+          emptyTitle={search || activeCount > 0 ? t("stockPage.emptyFilteredTitle") : t("stockPage.emptyTitle")}
           emptyDescription={
             search || activeCount > 0
-              ? "Try a different search or clear the filters."
-              : "Add your first ingredient to start tracking par levels and waste."
+              ? t("stockPage.emptyFilteredDescription")
+              : t("stockPage.emptyDescription")
           }
           emptyAction={
             activeCount === 0 &&
             !search && (
               <Button size="sm" onClick={openNew}>
-                New ingredient
+                {t("stockPage.emptyActionNew")}
               </Button>
             )
           }
@@ -563,4 +585,3 @@ export default function StockPage() {
     </AdminShell>
   );
 }
-

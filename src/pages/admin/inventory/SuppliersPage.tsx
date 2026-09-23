@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Building2, Mail, Pencil, Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { Supplier } from "@/types";
 import { deleteSupplier, getSuppliers } from "@/lib/api/suppliers";
 import { countActiveFilters, matchesSearch } from "@/lib/filters";
@@ -24,7 +25,14 @@ import {
 type ContactFilter = "all" | "yes" | "no";
 type SortKey = "name" | "contact";
 
+const SORT_KEY_LABEL_KEY = {
+  name: "suppliersPage.sortName",
+  contact: "suppliersPage.sortContactInfo",
+} as const satisfies Record<SortKey, string>;
+
 export default function SuppliersPage() {
+  const { t } = useTranslation("inventory");
+  const { t: tCommon } = useTranslation("common");
   const [suppliers, setSuppliers] = useState<Supplier[] | null>(null);
   const [search, setSearch] = useState("");
   const [contactFilter, setContactFilter] = useState<ContactFilter>("all");
@@ -42,12 +50,12 @@ export default function SuppliersPage() {
   }, [refresh]);
 
   async function handleDelete(supplier: Supplier) {
-    if (!window.confirm(`Delete supplier "${supplier.name}"? This can't be undone.`)) return;
+    if (!window.confirm(t("suppliersPage.confirmDelete", { name: supplier.name }))) return;
     setDeletingId(supplier.id);
     try {
       await deleteSupplier(supplier.id);
       refresh();
-      showToast("Supplier deleted", "success");
+      showToast(t("suppliersPage.toastDeleted"), "success");
     } catch (error) {
       showToast(errorMessage(error), "error");
     } finally {
@@ -61,8 +69,16 @@ export default function SuppliersPage() {
   });
 
   const chips: FilterChip[] = [];
-  if (contactFilter !== "all") chips.push({ key: "contact", label: `Contact: ${contactFilter === "yes" ? "on file" : "missing"}` });
-  if (sortKey !== "name") chips.push({ key: "sort", label: `Sorted by ${sortKey}` });
+  if (contactFilter !== "all") {
+    chips.push({
+      key: "contact",
+      label: t("suppliersPage.chipContact", {
+        state: contactFilter === "yes" ? t("suppliersPage.chipContactOnFile") : t("suppliersPage.chipContactMissing"),
+      }),
+    });
+  }
+  if (sortKey !== "name")
+    chips.push({ key: "sort", label: t("suppliersPage.chipSortedBy", { sort: t(SORT_KEY_LABEL_KEY[sortKey]) }) });
 
   function removeChip(key: string) {
     if (key === "contact") setContactFilter("all");
@@ -91,7 +107,7 @@ export default function SuppliersPage() {
   const columns: DataTableColumn<Supplier>[] = [
     {
       key: "name",
-      header: "Name",
+      header: t("suppliersPage.colName"),
       sortable: true,
       accessor: (supplier) => supplier.name,
       render: (supplier) => (
@@ -105,7 +121,7 @@ export default function SuppliersPage() {
     },
     {
       key: "contact",
-      header: "Contact",
+      header: t("suppliersPage.colContact"),
       sortable: true,
       accessor: (supplier) => supplier.contactInfo,
       render: (supplier) =>
@@ -127,12 +143,12 @@ export default function SuppliersPage() {
           <Link to={`/admin/inventory/suppliers/${supplier.id}/edit`}>
             <Button variant="secondary" size="sm">
               <Pencil className="h-3.5 w-3.5" strokeWidth={2} />
-              Edit
+              {tCommon("actions.edit")}
             </Button>
           </Link>
           <Button variant="danger" size="sm" onClick={() => handleDelete(supplier)} loading={deletingId === supplier.id}>
             <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-            Delete
+            {tCommon("actions.delete")}
           </Button>
         </div>
       ),
@@ -142,44 +158,44 @@ export default function SuppliersPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Inventory"
-        title="Suppliers"
-        description="Vendors you order ingredients from."
+        eyebrow={t("suppliersPage.eyebrow")}
+        title={t("suppliersPage.title")}
+        description={t("suppliersPage.description")}
         actions={
           <>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search suppliers…" className="w-52" />
+            <SearchInput value={search} onChange={setSearch} placeholder={t("suppliersPage.searchPlaceholder")} className="w-52" />
             <FilterToggleButton open={open} onToggle={toggle} activeCount={activeCount} />
             <Link to="/admin/inventory/suppliers/new">
-              <Button>New supplier</Button>
+              <Button>{t("suppliersPage.newSupplier")}</Button>
             </Link>
           </>
         }
       />
 
-      <FilterPanel open={open} title="Filter suppliers" onReset={activeCount > 0 ? resetFilters : undefined}>
+      <FilterPanel open={open} title={t("suppliersPage.filterTitle")} onReset={activeCount > 0 ? resetFilters : undefined}>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <FilterField label="Contact info" htmlFor="supplier-contact-filter">
+          <FilterField label={t("suppliersPage.contactInfoLabel")} htmlFor="supplier-contact-filter">
             <Select
               id="supplier-contact-filter"
               value={contactFilter}
               onChange={(event) => setContactFilter(event.target.value as ContactFilter)}
             >
-              <option value="all">Any</option>
-              <option value="yes">Has contact details</option>
-              <option value="no">Missing contact details</option>
+              <option value="all">{t("suppliersPage.anyContact")}</option>
+              <option value="yes">{t("suppliersPage.hasContactDetails")}</option>
+              <option value="no">{t("suppliersPage.missingContactDetails")}</option>
             </Select>
           </FilterField>
 
-          <FilterField label="Sort by" htmlFor="supplier-sort">
+          <FilterField label={t("suppliersPage.sortByLabel")} htmlFor="supplier-sort">
             <Select id="supplier-sort" value={sortKey} onChange={(event) => setSortKey(event.target.value as SortKey)}>
-              <option value="name">Name</option>
-              <option value="contact">Contact info</option>
+              <option value="name">{t("suppliersPage.sortName")}</option>
+              <option value="contact">{t("suppliersPage.sortContactInfo")}</option>
             </Select>
           </FilterField>
 
-          <FilterField label="Showing" className="sm:col-span-2">
+          <FilterField label={t("suppliersPage.showingLabel")} className="sm:col-span-2">
             <p className="rounded-lg border border-border bg-surface-sunken px-3 py-2 text-sm text-ink-soft">
-              {filtered?.length ?? 0} of {suppliers?.length ?? 0} suppliers shown
+              {t("suppliersPage.showingSummary", { shown: filtered?.length ?? 0, total: suppliers?.length ?? 0 })}
             </p>
           </FilterField>
         </div>
@@ -191,15 +207,15 @@ export default function SuppliersPage() {
         data={filtered}
         keyField={(supplier) => supplier.id}
         emptyIcon={Building2}
-        emptyTitle={search || activeCount > 0 ? "No suppliers match" : "No suppliers yet"}
+        emptyTitle={search || activeCount > 0 ? t("suppliersPage.emptyFilteredTitle") : t("suppliersPage.emptyTitle")}
         emptyDescription={
-          search || activeCount > 0 ? "Try a different search or clear the filters." : "Add a supplier to start creating purchase orders."
+          search || activeCount > 0 ? t("suppliersPage.emptyFilteredDescription") : t("suppliersPage.emptyDescription")
         }
         emptyAction={
           activeCount === 0 &&
           !search && (
             <Link to="/admin/inventory/suppliers/new">
-              <Button size="sm">New supplier</Button>
+              <Button size="sm">{t("suppliersPage.emptyActionNew")}</Button>
             </Link>
           )
         }

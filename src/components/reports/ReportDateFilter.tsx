@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { RANGE_PRESETS, rangeLabel, resolveRange } from "@/lib/filters";
 import Select from "@/components/ui/Select";
 import Input from "@/components/ui/Input";
@@ -45,16 +46,19 @@ export function useReportDateRange(storageKey: string, defaultDays = 14): Report
 }
 
 export function ReportDateFilterButton({ state }: { state: ReportDateRangeState }) {
-  return <FilterToggleButton open={state.open} onToggle={state.toggle} activeCount={state.active ? 1 : 0} label="Date range" />;
+  const { t } = useTranslation("reports");
+  return <FilterToggleButton open={state.open} onToggle={state.toggle} activeCount={state.active ? 1 : 0} label={t("reportDate.buttonLabel")} />;
 }
 
 export function ReportDateFilterPanel({ state, idPrefix }: { state: ReportDateRangeState; idPrefix: string }) {
+  const { t } = useTranslation("reports");
+  const { t: tCommon } = useTranslation("common");
   const { days, setDays, from, setFrom, to, setTo, open, reset, active } = state;
 
   return (
-    <FilterPanel open={open} title="Filter by date" onReset={active ? reset : undefined}>
+    <FilterPanel open={open} title={t("reportDate.filterTitle")} onReset={active ? reset : undefined}>
       <div className="grid gap-3 sm:grid-cols-3">
-        <FilterField label="Window" htmlFor={`${idPrefix}-days`}>
+        <FilterField label={t("reportDate.window.label")} htmlFor={`${idPrefix}-days`}>
           <Select
             id={`${idPrefix}-days`}
             value={days}
@@ -66,24 +70,24 @@ export function ReportDateFilterPanel({ state, idPrefix }: { state: ReportDateRa
           >
             {RANGE_PRESETS.map((option) => (
               <option key={option} value={option}>
-                Last {option} days
+                {tCommon("range.lastDays", { count: option })}
               </option>
             ))}
           </Select>
         </FilterField>
 
-        <FilterField label="From" htmlFor={`${idPrefix}-from`} hint="Overrides the preset">
+        <FilterField label={t("reportDate.custom.from.label")} htmlFor={`${idPrefix}-from`} hint={t("reportDate.custom.from.hint")}>
           <Input id={`${idPrefix}-from`} type="date" value={from} onChange={(event) => setFrom(event.target.value)} />
         </FilterField>
 
-        <FilterField label="To" htmlFor={`${idPrefix}-to`}>
+        <FilterField label={t("reportDate.custom.to.label")} htmlFor={`${idPrefix}-to`}>
           <Input id={`${idPrefix}-to`} type="date" value={to} onChange={(event) => setTo(event.target.value)} />
         </FilterField>
       </div>
 
       {(from || to) && (
         <FilterChips
-          chips={[{ key: "range", label: `Window: ${rangeLabel({ days, from, to })}` }]}
+          chips={[{ key: "range", label: t("reportDate.windowChip", { window: rangeLabel({ days, from, to }) }) }]}
           onRemove={reset}
           onClear={reset}
         />

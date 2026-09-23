@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import type { Category } from "@/types";
 import { createProduct, getCategories, getProductById, updateProduct, type ProductInput } from "@/lib/api/products";
-import { WEEKDAYS, WEEKDAY_LABELS, todayWeekday, type Weekday } from "@/lib/weekday";
-import { weekdayLabel } from "@/lib/i18n/labels";
+import { WEEKDAYS, todayWeekday, type Weekday } from "@/lib/weekday";
+import { badgeLabel, weekdayLabel } from "@/lib/i18n/labels";
 import { useTranslation } from "react-i18next";
 import type { DealWindow } from "@/lib/deals";
 import { errorMessage } from "@/lib/errors";
@@ -30,7 +30,8 @@ export default function ProductFormPage() {
   const isEdit = Boolean(productId);
   const navigate = useNavigate();
   const { showToast } = useToast();
-  const { t } = useTranslation("common");
+  const { t } = useTranslation("menu");
+  const { t: tCommon } = useTranslation("common");
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState("");
@@ -81,11 +82,11 @@ export default function ProductFormPage() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!name.trim() || !categoryId) {
-      showToast("Name and category are required", "error");
+      showToast(t("productForm.errors.nameAndCategory"), "error");
       return;
     }
     if (dealEnabled && dealWindows.length === 0) {
-      showToast("Add at least one day and time window for the deal, or turn it off", "error");
+      showToast(t("productForm.errors.dealWindows"), "error");
       return;
     }
 
@@ -106,10 +107,10 @@ export default function ProductFormPage() {
     try {
       if (isEdit && productId) {
         await updateProduct(productId, input);
-        showToast("Product updated", "success");
+        showToast(t("productForm.toastUpdated"), "success");
       } else {
         await createProduct(input);
-        showToast("Product created", "success");
+        showToast(t("productForm.toastCreated"), "success");
       }
       navigate("/admin/menu");
     } catch (error) {
@@ -120,8 +121,8 @@ export default function ProductFormPage() {
   if (loading) {
     return (
       <AdminShell>
-        <PageHeader eyebrow="Menu · Product" title="Loading product…" />
-        <p className="text-sm text-ink-soft">Fetching the current menu item…</p>
+        <PageHeader eyebrow={t("productForm.eyebrow")} title={t("productForm.loadingTitle")} />
+        <p className="text-sm text-ink-soft">{t("productForm.loadingBody")}</p>
       </AdminShell>
     );
   }
@@ -130,10 +131,10 @@ export default function ProductFormPage() {
     return (
       <AdminShell>
         <PageHeader
-          eyebrow="Menu · Product"
-          title="Product not found"
-          description="It may have been deleted from the menu."
-          actions={<BackLink to="/admin/menu" label="Back to menu" />}
+          eyebrow={t("productForm.eyebrow")}
+          title={t("productForm.notFound.title")}
+          description={t("productForm.notFound.body")}
+          actions={<BackLink to="/admin/menu" label={t("productForm.back")} />}
         />
       </AdminShell>
     );
@@ -142,20 +143,26 @@ export default function ProductFormPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow={isEdit ? "Menu · Edit product" : "Menu · New product"}
-        title={isEdit ? name || "Edit product" : "New product"}
-        description="Price, cost and availability here flow straight through to POS and the QR menu."
-        actions={<BackLink to="/admin/menu" label="Back to menu" />}
+        eyebrow={t("productForm.eyebrow")}
+        title={isEdit ? name || t("productForm.titleEdit") : t("productForm.titleNew")}
+        description={t("productForm.description")}
+        actions={<BackLink to="/admin/menu" label={t("productForm.back")} />}
       />
 
       <Card className="max-w-2xl" padding="lg">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Name" htmlFor="product-name" required>
-            <Input id="product-name" value={name} onChange={(event) => setName(event.target.value)} required />
+          <FormField label={t("productForm.form.name")} htmlFor="product-name" required>
+            <Input
+              id="product-name"
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder={t("productForm.form.namePlaceholder")}
+              required
+            />
           </FormField>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Category" htmlFor="product-category" required>
+            <FormField label={t("productForm.form.category.label")} htmlFor="product-category" required>
               <Select id="product-category" value={categoryId} onChange={(event) => setCategoryId(event.target.value)}>
                 {categories.map((category) => (
                   <option key={category.id} value={category.id}>
@@ -165,28 +172,30 @@ export default function ProductFormPage() {
               </Select>
             </FormField>
 
-            <FormField label="Availability" htmlFor="product-availability">
+            <FormField label={t("productForm.form.availability.label")} htmlFor="product-availability">
               <Select
                 id="product-availability"
                 value={isAvailable ? "yes" : "no"}
                 onChange={(event) => setIsAvailable(event.target.value === "yes")}
               >
-                <option value="yes">On menu</option>
-                <option value="no">Hidden from menu</option>
+                <option value="yes">{t("productForm.form.availability.onMenu")}</option>
+                <option value="no">{t("productForm.form.availability.hidden")}</option>
               </Select>
             </FormField>
           </div>
 
           <FormField
-            label="Available on"
+            label={t("productForm.form.days.label")}
             htmlFor="product-days"
             hint={
               days.length === 0
-                ? "Every day. Pick specific days to make this a day-limited item (e.g. a weekend special)."
-                : `Shows on the customer menu only on: ${days.map((day) => WEEKDAY_LABELS[day]).join(", ")}.`
+                ? t("productForm.form.days.hintEveryDay")
+                : t("productForm.form.days.hintSpecificDays", {
+                    days: days.map((day) => weekdayLabel(tCommon, day)).join(", "),
+                  })
             }
           >
-            <div id="product-days" role="group" aria-label="Available on" className="flex flex-wrap gap-1.5">
+            <div id="product-days" role="group" aria-label={t("productForm.form.days.label")} className="flex flex-wrap gap-1.5">
               {WEEKDAYS.map((day) => {
                 const active = days.includes(day);
                 return (
@@ -202,9 +211,9 @@ export default function ProductFormPage() {
                         ? "border-accent bg-accent-soft text-accent-strong"
                         : "border-border bg-surface-raised text-ink-soft hover:border-accent"
                     } ${day === todayWeekday() ? "ring-1 ring-inset ring-accent/30" : ""}`}
-                    title={day === todayWeekday() ? "Today" : undefined}
+                    title={day === todayWeekday() ? t("productForm.form.days.today") : undefined}
                   >
-                    {weekdayLabel(t, day)}
+                    {weekdayLabel(tCommon, day)}
                   </button>
                 );
               })}
@@ -214,16 +223,16 @@ export default function ProductFormPage() {
                   onClick={() => setDays([])}
                   className="rounded-full px-2 py-1 text-xs font-medium text-ink-soft hover:text-accent-strong"
                 >
-                  Every day
+                  {t("productForm.form.days.everyDay")}
                 </button>
               )}
             </div>
           </FormField>
 
           <FormField
-            label="Limited-time deal"
+            label={t("productForm.form.deal.label")}
             htmlFor="product-deal-toggle"
-            hint="A special price that only applies during specific day+time windows — everything else shows the regular price."
+            hint={t("productForm.form.deal.hint")}
           >
             <label className="flex items-center gap-2 text-sm text-ink">
               <input
@@ -233,17 +242,27 @@ export default function ProductFormPage() {
                 onChange={(event) => {
                   setDealEnabled(event.target.checked);
                   if (event.target.checked && dealWindows.length === 0) {
-                    setDealWindows([{ day: todayWeekday(), startTime: "11:00", endTime: "14:00" }]);
+                    setDealWindows([
+                      {
+                        day: todayWeekday(),
+                        startTime: t("dealWindows.seedStart"),
+                        endTime: t("dealWindows.seedEnd"),
+                      },
+                    ]);
                   }
                 }}
                 className="h-4 w-4 rounded border-border accent-accent"
               />
-              Run a deal for this item
+              {t("productForm.form.deal.toggle")}
             </label>
 
             {dealEnabled && (
               <div className="mt-3 space-y-3 rounded-lg border border-border bg-surface-sunken p-3">
-                <FormField label="Deal price" htmlFor="product-deal-price" hint="Must be less than the regular sell price">
+                <FormField
+                  label={t("productForm.form.deal.price.label")}
+                  htmlFor="product-deal-price"
+                  hint={t("productForm.form.deal.price.hint")}
+                >
                   <Input
                     id="product-deal-price"
                     type="number"
@@ -259,19 +278,24 @@ export default function ProductFormPage() {
             )}
           </FormField>
 
-          <FormField label="Description" htmlFor="product-description">
+          <FormField label={t("productForm.form.description.label")} htmlFor="product-description">
             <textarea
               id="product-description"
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               rows={3}
               className="w-full rounded-lg border border-border bg-surface-raised px-3 py-2 text-sm text-ink placeholder:text-ink-soft/60 transition-colors hover:border-border-strong focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/25"
-              placeholder="What's in it?"
+              placeholder={t("productForm.form.description.placeholder")}
             />
           </FormField>
 
           <div className="grid gap-4 sm:grid-cols-2">
-            <FormField label="Sell price" htmlFor="product-price" required hint="Charged at POS">
+            <FormField
+              label={t("productForm.form.price.label")}
+              htmlFor="product-price"
+              required
+              hint={t("productForm.form.price.hint")}
+            >
               <Input
                 id="product-price"
                 type="number"
@@ -283,7 +307,11 @@ export default function ProductFormPage() {
               />
             </FormField>
 
-            <FormField label="Cost price" htmlFor="product-cost" hint="Used when no recipe exists">
+            <FormField
+              label={t("productForm.form.costPrice.label")}
+              htmlFor="product-cost"
+              hint={t("productForm.form.costPrice.hint")}
+            >
               <Input
                 id="product-cost"
                 type="number"
@@ -296,16 +324,20 @@ export default function ProductFormPage() {
           </div>
 
           <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_10rem]">
-            <FormField label="Image path" htmlFor="product-image" hint="e.g. /burger1.jfif — served from /public">
+            <FormField
+              label={t("productForm.form.image.label")}
+              htmlFor="product-image"
+              hint={t("productForm.form.image.hint")}
+            >
               <Input
                 id="product-image"
                 value={image}
                 onChange={(event) => setImage(event.target.value)}
-                placeholder="/burger1.jfif"
+                placeholder={t("productForm.form.image.placeholder")}
               />
             </FormField>
 
-            <FormField label="Badge" htmlFor="product-badge">
+            <FormField label={t("productForm.form.badge.label")} htmlFor="product-badge">
               <Select
                 id="product-badge"
                 value={badge}
@@ -313,7 +345,7 @@ export default function ProductFormPage() {
               >
                 {BADGES.map((option) => (
                   <option key={option} value={option}>
-                    {option === "none" ? "No badge" : option}
+                    {option === "none" ? t("productForm.form.badge.none") : badgeLabel(tCommon, option)}
                   </option>
                 ))}
               </Select>
@@ -323,22 +355,18 @@ export default function ProductFormPage() {
           {image && (
             <div className="flex items-center gap-3 rounded-lg border border-border bg-surface-sunken p-3">
               <DataTableThumbnail src={image} alt={name || "Product preview"} size={48} />
-              <p className="text-xs text-ink-soft">Preview — the same image is used on the POS grid and QR menu.</p>
+              <p className="text-xs text-ink-soft">{t("productForm.form.image.previewNote")}</p>
             </div>
           )}
 
           <div className="flex items-center gap-3 pt-1">
             <Button type="submit" loading={saving}>
-              {isEdit ? "Save changes" : "Create product"}
+              {isEdit ? tCommon("actions.saveChanges") : t("productForm.createButton")}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate("/admin/menu")} disabled={saving}>
-              Cancel
+              {tCommon("actions.cancel")}
             </Button>
-            {isEdit && (
-              <p className="ms-auto text-xs text-ink-soft">
-                Recipe &amp; stock deductions are managed under Inventory → Recipes.
-              </p>
-            )}
+            {isEdit && <p className="ms-auto text-xs text-ink-soft">{t("productForm.recipeNote")}</p>}
           </div>
         </form>
       </Card>

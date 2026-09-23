@@ -1,0 +1,315 @@
+{
+  "page": {
+    "menu": {
+      "eyebrow": "القائمة",
+      "title": "القائمة",
+      "description": "كل منتج تبيعه، سعره، وما إذا كنت عدّلته التكلفة. أضف أو عدّل أو أخفِ العناصر من هنا."
+    },
+    "deals": {
+      "eyebrow": "القائمة",
+      "title": "العروض",
+      "description": "أسعار خاصة محدودة الوقت، تنشط فقط خلال أيام وأوقات محددة. كل ما عداها يبقى بسعره العادي."
+    }
+  },
+  "tabs": {
+    "customerMenu": "قائمة العملاء اليوم",
+    "categories": "التصنيفات",
+    "dealsTab": "العروض"
+  },
+  "customerMenu": {
+    "heading": "ما يراه العملاء اليوم ({{weekday}}) على الموقع وقائمة الـ QR",
+    "toggleTitle": "معاينة ما يراه العملاء في قائمة اليوم",
+    "empty": "لا يوجد شيء متاح اليوم — تحقق من التوفر وجدول الأيام.",
+    "priceLabel": "{{name}} — {{price}}",
+    "dealPriceLabel": "{{name}} — {{original}} → {{price}}"
+  },
+  "filters": {
+    "panelTitle": "تصفية القائمة",
+    "searchPlaceholder": "ابحث في القائمة…",
+    "category": {
+      "label": "التصنيف",
+      "all": "كل التصنيفات"
+    },
+    "availability": {
+      "label": "التوفر",
+      "any": "أي",
+      "onMenu": "موجود في القائمة",
+      "hidden": "مخفي"
+    },
+    "priceRange": {
+      "label": "نطاق السعر"
+    },
+    "costRange": {
+      "label": "نطاق التكلفة"
+    },
+    "priceMin": {
+      "label": "الحد الأدنى للسعر",
+      "placeholder": "0.00"
+    },
+    "priceMax": {
+      "label": "الحد الأقصى للسعر",
+      "placeholder": "99.00"
+    },
+    "badge": {
+      "label": "البطاقة",
+      "all": "أي بطاقة",
+      "unlimited": "بدون حد",
+      "new": "جديد",
+      "popular": "الأكثر طلباً",
+      "deal": "عرض",
+      "none": "بدون بطاقة"
+    },
+    "recipe": {
+      "label": "الوصفة",
+      "all": "أي",
+      "with": "تتوفر وصفة",
+      "without": "بدون وصفة"
+    },
+    "recipeInfo": {
+      "label": "إظهار معلومات الوصفة",
+      "hint": "التكلفة وأوقات الإعداد والطهي فقط — مرئي للموظفين، ليس في قائمة العميل."
+    },
+    "chips": {
+      "category": "التصنيف: {{name}}",
+      "availability": "التوفر: {{value}}",
+      "badge": "البطاقة: {{value}}",
+      "recipe": "الوصفة: {{value}}",
+      "recipeWith": "متوفرة",
+      "recipeWithout": "غير متوفرة",
+      "priceMin": "الحد الأدنى ${{value}}",
+      "priceMax": "الحد الأقصى ${{value}}"
+    }
+  },
+  "columns": {
+    "name": "المنتج",
+    "category": "التصنيف",
+    "price": "السعر",
+    "cost": "التكلفة",
+    "margin": "الربح",
+    "availability": "التوفر",
+    "days": "الأيام",
+    "deal": "العرض",
+    "dealPrice": "سعر العرض",
+    "dealSchedule": "جدول العرض",
+    "regularPrice": "السعر الأصلي",
+    "rightNow": "الآن",
+    "recipe": "الوصفة"
+  },
+  "availabilityPill": {
+    "onMenu": "موجود في القائمة",
+    "hidden": "مخفي"
+  },
+  "recipeStatus": {
+    "costed": "محسوبة التكلفة",
+    "missing": "غير محسوبة"
+  },
+  "badgeRow": {
+    "new": "منتج جديد",
+    "popular": "الأكثر طلباً",
+    "deal": "على عرض"
+  },
+  "delete": {
+    "title": "حذف \"{{name}}\"?",
+    "body": "وصفته يُحذف أيضاً. لا يمكن التراجع عن هذا.",
+    "buttonTitle": "حذف المنتج"
+  },
+  "menuPage": {
+    "recipeLink": "الوصفة",
+    "recipeLinkTitle": "تعديل الوصفة",
+    "csvButton": "CSV",
+    "csvButtonTitle": "تصدير القائمة المُصفّاة",
+    "newProductButton": "منتج جديد",
+    "toastDeleted": "تم حذف المنتج",
+    "emptyFilteredTitle": "لا توجد منتجات مطابقة",
+    "emptyFilteredDescription": "خفّف أحد المرشحات أو امسح البحث لرؤية المزيد.",
+    "emptyTitle": "لا توجد منتجات بعد",
+    "emptyDescription": "أضف أول عنصر إلى قائمتك.",
+    "footerNote": "الربح يعتمد على تكلفة الوصفة إن وُجدت، وإلا فعلى تكلفة الشراء للمنتج. الأسعار هنا هي ما تُحصّله نقطة البيع وقائمة الـ QR."
+  },
+  "productForm": {
+    "eyebrow": "القائمة",
+    "titleNew": "منتج جديد",
+    "titleEdit": "تعديل المنتج",
+    "back": "العودة للقائمة",
+    "description": "السعر والتكلفة والتوفر هنا تنعكس مباشرة على نقطة البيع وقائمة الـ QR.",
+    "loadingTitle": "جارٍ تحميل المنتج…",
+    "loadingBody": "يتم جلب بيانات المنتج الحالي…",
+    "form": {
+      "name": "اسم المنتج",
+      "namePlaceholder": "مثلاً طبق شاورما",
+      "nameHint": "يظهر في القائمة والفواتير وقائمة الـ QR.",
+      "category": {
+        "label": "التصنيف",
+        "placeholder": "اختر تصنيفاً"
+      },
+      "description": {
+        "label": "الوصف",
+        "placeholder": "ما مكوناته؟"
+      },
+      "price": {
+        "label": "سعر البيع",
+        "placeholder": "0.00",
+        "hint": "يُحصَّل في نقطة البيع."
+      },
+      "costPrice": {
+        "label": "تكلفة الشراء",
+        "placeholder": "0.00",
+        "hint": "تُستخدم عند عدم وجود وصفة."
+      },
+      "image": {
+        "label": "مسار الصورة",
+        "placeholder": "/burger1.jfif",
+        "hint": "مثلاً /burger1.jfif — تُقرأ من مجلد /public",
+        "previewNote": "معاينة — نفس الصورة تُستخدم في شاشة نقطة البيع وقائمة الـ QR."
+      },
+      "availability": {
+        "label": "التوفر",
+        "onMenu": "موجود في القائمة",
+        "hidden": "مخفي من القائمة"
+      },
+      "days": {
+        "label": "متاح في",
+        "hintEveryDay": "كل الأيام. اختر أياماً محددة لجعل العنصر محدود الأيام (مثلاً عرض نهاية الأسبوع).",
+        "hintSpecificDays": "يظهر في قائمة العميل فقط في: {{days}}.",
+        "everyDay": "كل الأيام",
+        "today": "اليوم"
+      },
+      "badge": {
+        "label": "البطاقة",
+        "none": "بدون بطاقة"
+      },
+      "deal": {
+        "label": "عرض محدود الوقت",
+        "hint": "سعر خاص يُطبق فقط خلال نوافذ أيام وأوقات محددة — وفيما عداها يظهر السعر العادي.",
+        "toggle": "تشغيل عرض لهذا العنصر",
+        "price": {
+          "label": "سعر العرض",
+          "placeholder": "0.00",
+          "hint": "يجب أن يكون أقل من سعر البيع العادي."
+        }
+      }
+    },
+    "recipeNote": "الوصفة وخصم المخزون تُدار من المخزون ← الوصفات.",
+    "createButton": "إنشاء منتج",
+    "errors": {
+      "nameAndCategory": "الاسم والتصنيف مطلوبان",
+      "dealWindows": "أضف يومًا واحدًا على الأقل ونافذة زمنية للعرض، أو أطفئه"
+    },
+    "toastCreated": "تم إنشاء المنتج",
+    "toastUpdated": "تم تحديث المنتج",
+    "notFound": {
+      "title": "المنتج غير موجود",
+      "body": "هذا المنتج غير موجود أو تم حذفه."
+    }
+  },
+  "dealWindows": {
+    "to": "إلى",
+    "add": "إضافة يوم ووقت",
+    "remove": "إزالة هذه النافذة",
+    "seedStart": "11:00",
+    "seedEnd": "14:00"
+  },
+  "dealsPage": {
+    "back": "العودة للقائمة",
+    "searchPlaceholder": "ابحث في العروض…",
+    "active": "نشط",
+    "notActive": "غير نشط",
+    "removeButton": "إزالة",
+    "removeTitle": "إزالة هذا العرض",
+    "removeConfirm": "إزالة العرض من \"{{name}}\"? يعود إلى سعره العادي.",
+    "toastRemoved": "تم إزالة العرض",
+    "emptyTitle": "لا توجد عروض بعد",
+    "emptyFilteredTitle": "لا توجد عروض مطابقة",
+    "emptyDescription": "أضف سعرًا خاصًا محدود الوقت لعنصر في القائمة ليظهر هنا.",
+    "emptyFilteredDescription": "جرّب بحثًا مختلفًا."
+  },
+  "dealFormPage": {
+    "eyebrow": "القائمة",
+    "titleNew": "عرض جديد",
+    "titleEditPrefix": "عرض على {{name}}",
+    "description": "سعر خاص يكون نشطًا فقط خلال نوافذ الأيام والأوقات أدناه. خارجها، يظهر العنصر بسعره العادي.",
+    "back": "العودة للعروض",
+    "loadingTitle": "جارٍ تحميل العرض…",
+    "loadingBody": "يتم جلب بيانات العرض الحالي…",
+    "notFound": {
+      "title": "العرض غير موجود",
+      "body": "ربما تمت إزالته بالفعل."
+    },
+    "form": {
+      "product": {
+        "label": "المنتج",
+        "placeholder": "اختر منتجًا…"
+      },
+      "price": {
+        "label": "سعر العرض",
+        "hint": "يجب أن يكون أقل من السعر العادي البالغ {{price}}"
+      },
+      "activeDuring": "نشط خلال"
+    },
+    "errors": {
+      "productRequired": "اختر منتجًا لهذا العرض",
+      "windowsRequired": "أضف يومًا واحدًا على الأقل ونافذة زمنية"
+    },
+    "createButton": "إنشاء عرض",
+    "removeButton": "إزالة العرض",
+    "removeConfirm": "إزالة هذا العرض؟ يعود العنصر إلى سعره العادي.",
+    "toastCreated": "تم إنشاء العرض",
+    "toastUpdated": "تم تحديث العرض",
+    "toastRemoved": "تم إزالة العرض"
+  },
+  "categoriesPage": {
+    "eyebrow": "القائمة",
+    "title": "تصنيفات القائمة",
+    "description": "التبويبات التي يراها الضيوف والكاشير. ترتيب الفرز يتحكم بمكان ظهور كل تصنيف.",
+    "back": "العودة للقائمة",
+    "searchPlaceholder": "ابحث في التصنيفات…",
+    "filterTitle": "تصفية التصنيفات",
+    "usage": {
+      "label": "الاستخدام",
+      "all": "كل التصنيفات",
+      "populated": "بها منتجات",
+      "empty": "فارغة"
+    },
+    "sortBy": {
+      "label": "الفرز حسب",
+      "order": "ترتيب القائمة",
+      "name": "الاسم",
+      "products": "الأكثر منتجات"
+    },
+    "showingLabel": "المعروض",
+    "showing": "{{shown}} من {{total}} تصنيف معروض",
+    "chips": {
+      "usageEmpty": "الاستخدام: فارغة",
+      "usagePopulated": "الاستخدام: بها منتجات",
+      "sortedBy": "مرتّب حسب {{sort}}"
+    },
+    "newCategory": {
+      "label": "تصنيف جديد",
+      "placeholder": "مثلاً الحلويات",
+      "sortOrderLabel": "ترتيب الفرز"
+    },
+    "addButton": "إضافة تصنيف",
+    "columns": {
+      "order": "#",
+      "name": "التصنيف",
+      "products": "المنتجات"
+    },
+    "productCountEmpty": "فارغ",
+    "productCount_zero": "لا عناصر",
+    "productCount_one": "{{count}} عنصر",
+    "productCount_two": "{{count}} عنصران",
+    "productCount_few": "{{count}} عناصر",
+    "productCount_many": "{{count}} عنصرًا",
+    "productCount_other": "{{count}} عنصر",
+    "deleteConfirm": "حذف تصنيف \"{{name}}\"؟",
+    "deleteDisabledTitle": "انقل منتجاته إلى تصنيف آخر أولاً",
+    "deleteTitle": "حذف التصنيف",
+    "toastCreated": "تم إنشاء التصنيف",
+    "toastUpdated": "تم تحديث التصنيف",
+    "toastDeleted": "تم حذف التصنيف",
+    "emptyFilteredTitle": "لا توجد تصنيفات مطابقة",
+    "emptyFilteredDescription": "جرّب بحثًا مختلفًا أو امسح المرشحات.",
+    "emptyTitle": "لا توجد تصنيفات بعد",
+    "emptyDescription": "أضف تصنيفًا أعلاه، ثم اربط المنتجات به من القائمة."
+  }
+}

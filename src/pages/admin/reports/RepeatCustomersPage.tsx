@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Users } from "lucide-react";
 import { getRepeatCustomers, type RepeatCustomerRow } from "@/lib/api/reports";
 import { exportToCsv } from "@/lib/csv";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatCurrency, formatNumber } from "@/lib/format";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
 import KpiTile from "@/components/reports/KpiTile";
@@ -12,6 +13,7 @@ import ReportExportBar from "@/components/reports/ReportExportBar";
 import { ReportDateFilterButton, ReportDateFilterPanel, useReportDateRange } from "@/components/reports/ReportDateFilter";
 
 export default function RepeatCustomersPage() {
+  const { t } = useTranslation("reports");
   const dateRange = useReportDateRange("report-repeat-customers-filters");
   const [rows, setRows] = useState<RepeatCustomerRow[] | null>(null);
   const [share, setShare] = useState(0);
@@ -35,30 +37,30 @@ export default function RepeatCustomersPage() {
   const columns: DataTableColumn<RepeatCustomerRow>[] = [
     {
       key: "phone",
-      header: "Phone",
+      header: t("columns.repeatCustomers.phone"),
       sortable: true,
       accessor: (row) => row.phone,
       render: (row) => <span className="font-medium text-ink">{row.phone}</span>,
     },
     {
       key: "visits",
-      header: "Visits",
+      header: t("columns.repeatCustomers.visits"),
       sortable: true,
       align: "right",
       accessor: (row) => row.visits,
-      render: (row) => <span className="tabular-nums text-ink">{row.visits}</span>,
+      render: (row) => <span className="tabular-nums text-ink">{formatNumber(row.visits)}</span>,
     },
     {
       key: "totalSpend",
-      header: "Total spend",
+      header: t("columns.repeatCustomers.totalSpend"),
       sortable: true,
       align: "right",
       accessor: (row) => row.totalSpend,
-      render: (row) => <span className="tabular-nums text-ink">${row.totalSpend.toFixed(2)}</span>,
+      render: (row) => <span className="tabular-nums text-ink">{formatCurrency(row.totalSpend)}</span>,
     },
     {
       key: "lastOrder",
-      header: "Last order",
+      header: t("columns.repeatCustomers.lastOrder"),
       sortable: true,
       accessor: (row) => row.lastOrderAt,
       render: (row) => <span className="text-ink-soft">{formatDate(row.lastOrderAt)}</span>,
@@ -68,8 +70,8 @@ export default function RepeatCustomersPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Reports"
-        title="Repeat customers"
+        eyebrow={t("page.repeatCustomers.eyebrow")}
+        title={t("page.repeatCustomers.title")}
         actions={
           <>
             <ReportDateFilterButton state={dateRange} />
@@ -82,8 +84,16 @@ export default function RepeatCustomersPage() {
       <ReportDateFilterPanel state={dateRange} idPrefix="repeat-customers" />
 
       <div className="mb-5 mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <KpiTile label="Repeat customers" value={String((rows ?? []).length)} />
-        <KpiTile label="Orders from repeats" value={`${share.toFixed(0)}%`} sub="of orders with a phone on file" />
+        <KpiTile
+          label={t("kpi.repeatCustomers.repeatCount.title")}
+          sub={t("kpi.repeatCustomers.repeatCount.sub")}
+          value={String((rows ?? []).length)}
+        />
+        <KpiTile
+          label={t("kpi.repeatCustomers.repeatShare.title")}
+          value={`${formatNumber(share, { maximumFractionDigits: 0 })}%`}
+          sub={t("kpi.repeatCustomers.repeatShare.sub")}
+        />
       </div>
 
       <DataTable
@@ -91,13 +101,11 @@ export default function RepeatCustomersPage() {
         data={rows}
         keyField={(row) => row.customerId}
         emptyIcon={Users}
-        emptyTitle="No repeat customers yet"
-        emptyDescription="Customers who order more than once will show up here."
+        emptyTitle={t("empty.noRepeatCustomers.title")}
+        emptyDescription={t("empty.noRepeatCustomers.description")}
       />
 
-      <p className="mt-3 text-xs text-ink-soft">
-        Only counts orders where a phone number was captured — optional on POS, required on the QR ordering flow.
-      </p>
+      <p className="mt-3 text-xs text-ink-soft">{t("page.repeatCustomers.footerNote")}</p>
     </AdminShell>
   );
 }

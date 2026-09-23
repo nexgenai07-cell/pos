@@ -7,6 +7,7 @@ import { todayWeekday } from "@/lib/weekday";
 import type { DealWindow } from "@/lib/deals";
 import { errorMessage } from "@/lib/errors";
 import { formatCurrency } from "@/lib/format";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/ui/Toast";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
@@ -28,12 +29,14 @@ export default function DealFormPage() {
   const isEdit = Boolean(productId);
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { t } = useTranslation("menu");
+  const { t: tCommon } = useTranslation("common");
 
   const [products, setProducts] = useState<ProductWithCategory[]>([]);
   const [selectedProductId, setSelectedProductId] = useState(productId ?? "");
   const [dealPrice, setDealPrice] = useState("");
   const [dealWindows, setDealWindows] = useState<DealWindow[]>([
-    { day: todayWeekday(), startTime: "11:00", endTime: "14:00" },
+    { day: todayWeekday(), startTime: t("dealWindows.seedStart"), endTime: t("dealWindows.seedEnd") },
   ]);
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
@@ -64,18 +67,18 @@ export default function DealFormPage() {
   async function handleSubmit(event: React.FormEvent) {
     event.preventDefault();
     if (!selectedProductId) {
-      showToast("Pick a product for this deal", "error");
+      showToast(t("dealFormPage.errors.productRequired"), "error");
       return;
     }
     if (dealWindows.length === 0) {
-      showToast("Add at least one day and time window", "error");
+      showToast(t("dealFormPage.errors.windowsRequired"), "error");
       return;
     }
 
     setSaving(true);
     try {
       await setProductDeal(selectedProductId, { price: Number(dealPrice) || 0, windows: dealWindows });
-      showToast(isEdit ? "Deal updated" : "Deal created", "success");
+      showToast(isEdit ? t("dealFormPage.toastUpdated") : t("dealFormPage.toastCreated"), "success");
       navigate("/admin/menu/deals");
     } catch (error) {
       showToast(errorMessage(error), "error");
@@ -85,11 +88,11 @@ export default function DealFormPage() {
 
   async function handleDelete() {
     if (!productId) return;
-    if (!window.confirm("Remove this deal? The item goes back to its regular price.")) return;
+    if (!window.confirm(t("dealFormPage.removeConfirm"))) return;
     setDeleting(true);
     try {
       await removeProductDeal(productId);
-      showToast("Deal removed", "success");
+      showToast(t("dealFormPage.toastRemoved"), "success");
       navigate("/admin/menu/deals");
     } catch (error) {
       showToast(errorMessage(error), "error");
@@ -100,8 +103,8 @@ export default function DealFormPage() {
   if (loading) {
     return (
       <AdminShell>
-        <PageHeader eyebrow="Menu · Deal" title="Loading deal…" />
-        <p className="text-sm text-ink-soft">Fetching the current deal…</p>
+        <PageHeader eyebrow={t("dealFormPage.eyebrow")} title={t("dealFormPage.loadingTitle")} />
+        <p className="text-sm text-ink-soft">{t("dealFormPage.loadingBody")}</p>
       </AdminShell>
     );
   }
@@ -110,10 +113,10 @@ export default function DealFormPage() {
     return (
       <AdminShell>
         <PageHeader
-          eyebrow="Menu · Deal"
-          title="Deal not found"
-          description="It may have already been removed."
-          actions={<BackLink to="/admin/menu/deals" label="Back to deals" />}
+          eyebrow={t("dealFormPage.eyebrow")}
+          title={t("dealFormPage.notFound.title")}
+          description={t("dealFormPage.notFound.body")}
+          actions={<BackLink to="/admin/menu/deals" label={t("dealFormPage.back")} />}
         />
       </AdminShell>
     );
@@ -122,22 +125,22 @@ export default function DealFormPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow={isEdit ? "Menu · Edit deal" : "Menu · New deal"}
-        title={isEdit ? `Deal on ${selectedProduct?.name ?? "…"}` : "New deal"}
-        description="A special price active only during the day+time windows below. Outside them, the item shows its regular price."
-        actions={<BackLink to="/admin/menu/deals" label="Back to deals" />}
+        eyebrow={t("dealFormPage.eyebrow")}
+        title={isEdit ? t("dealFormPage.titleEditPrefix", { name: selectedProduct?.name ?? "…" }) : t("dealFormPage.titleNew")}
+        description={t("dealFormPage.description")}
+        actions={<BackLink to="/admin/menu/deals" label={t("dealFormPage.back")} />}
       />
 
       <Card className="max-w-2xl" padding="lg">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Product" htmlFor="deal-product" required>
+          <FormField label={t("dealFormPage.form.product.label")} htmlFor="deal-product" required>
             <Select
               id="deal-product"
               value={selectedProductId}
               onChange={(event) => setSelectedProductId(event.target.value)}
               disabled={isEdit}
             >
-              <option value="">Select a product…</option>
+              <option value="">{t("dealFormPage.form.product.placeholder")}</option>
               {productOptions.map((product) => (
                 <option key={product.id} value={product.id}>
                   {product.name} ({formatCurrency(product.price)})
@@ -147,10 +150,14 @@ export default function DealFormPage() {
           </FormField>
 
           <FormField
-            label="Deal price"
+            label={t("dealFormPage.form.price.label")}
             htmlFor="deal-price"
             required
-            hint={selectedProduct ? `Must be less than the regular price of ${formatCurrency(selectedProduct.price)}` : undefined}
+            hint={
+              selectedProduct
+                ? t("dealFormPage.form.price.hint", { price: formatCurrency(selectedProduct.price) })
+                : undefined
+            }
           >
             <Input
               id="deal-price"
@@ -163,7 +170,7 @@ export default function DealFormPage() {
             />
           </FormField>
 
-          <FormField label="Active during" htmlFor="deal-windows">
+          <FormField label={t("dealFormPage.form.activeDuring")} htmlFor="deal-windows">
             <div id="deal-windows">
               <DealWindowsEditor windows={dealWindows} onChange={setDealWindows} />
             </div>
@@ -171,15 +178,15 @@ export default function DealFormPage() {
 
           <div className="flex items-center gap-3 pt-1">
             <Button type="submit" loading={saving}>
-              {isEdit ? "Save changes" : "Create deal"}
+              {isEdit ? tCommon("actions.saveChanges") : t("dealFormPage.createButton")}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate("/admin/menu/deals")} disabled={saving}>
-              Cancel
+              {tCommon("actions.cancel")}
             </Button>
             {isEdit && (
               <Button type="button" variant="danger" className="ms-auto" onClick={handleDelete} loading={deleting}>
                 <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-                Remove deal
+                {t("dealFormPage.removeButton")}
               </Button>
             )}
           </div>

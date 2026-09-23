@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { createSupplier } from "@/lib/api/suppliers";
 import { useToast } from "@/components/ui/Toast";
 import AdminShell from "@/components/ui/AdminShell";
@@ -11,6 +12,8 @@ import Input from "@/components/ui/Input";
 import BackLink from "@/components/ui/BackLink";
 
 export default function NewSupplierPage() {
+  const { t } = useTranslation("inventory");
+  const { t: tCommon } = useTranslation("common");
   const [name, setName] = useState("");
   const [contactInfo, setContactInfo] = useState("");
   const [saving, setSaving] = useState(false);
@@ -22,37 +25,37 @@ export default function NewSupplierPage() {
     if (!name.trim()) return;
     setSaving(true);
     await createSupplier({ name: name.trim(), contactInfo: contactInfo.trim() });
-    showToast("Supplier created", "success");
+    showToast(t("supplierForm.toastCreated"), "success");
     navigate("/admin/inventory/suppliers");
   }
 
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Inventory · Suppliers"
-        title="New supplier"
-        description="Add a vendor to start creating purchase orders."
-        actions={<BackLink to="/admin/inventory/suppliers" label="Back to suppliers" />}
+        eyebrow={t("newSupplierPage.eyebrow")}
+        title={t("newSupplierPage.title")}
+        description={t("newSupplierPage.description")}
+        actions={<BackLink to="/admin/inventory/suppliers" label={t("supplierForm.backToSuppliers")} />}
       />
       <Card className="max-w-md" padding="lg">
         <form onSubmit={handleSubmit} className="space-y-4">
-          <FormField label="Name" htmlFor="supplier-name" required>
+          <FormField label={t("supplierForm.nameLabel")} htmlFor="supplier-name" required>
             <Input id="supplier-name" value={name} onChange={(event) => setName(event.target.value)} required />
           </FormField>
-          <FormField label="Contact info" htmlFor="supplier-contact" hint="Email, phone, or both">
+          <FormField label={t("supplierForm.contactLabel")} htmlFor="supplier-contact" hint={t("supplierForm.contactHint")}>
             <Input
               id="supplier-contact"
               value={contactInfo}
               onChange={(event) => setContactInfo(event.target.value)}
-              placeholder="email · phone"
+              placeholder={t("supplierForm.contactPlaceholder")}
             />
           </FormField>
           <div className="flex items-center gap-3 pt-1">
             <Button type="submit" loading={saving}>
-              Save supplier
+              {t("supplierForm.saveSupplier")}
             </Button>
             <Button type="button" variant="secondary" onClick={() => navigate("/admin/inventory/suppliers")} disabled={saving}>
-              Cancel
+              {tCommon("actions.cancel")}
             </Button>
           </div>
         </form>

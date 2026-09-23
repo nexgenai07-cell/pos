@@ -1,0 +1,134 @@
+{
+  "page": {
+    "eyebrow": "Dashboard",
+    "title": "Quick review",
+    "description": "{{from}} – {{to}} · compared with {{prevFrom}} – {{prevTo}}",
+    "loading": "Loading the latest numbers…"
+  },
+  "actions": {
+    "searchPlaceholder": "Search orders…",
+    "exportTitle": "Export the filtered orders",
+    "exportCsv": "CSV",
+    "refresh": "Refresh",
+    "allReports": "All reports"
+  },
+  "filters": {
+    "panelTitle": "Filter everything on this page",
+    "window": "Window",
+    "from": "From",
+    "fromHint": "Overrides the preset",
+    "to": "To",
+    "category": "Category",
+    "allCategories": "All categories",
+    "paymentMethod": "Payment method",
+    "anyMethod": "Any method",
+    "orderStatus": "Order status",
+    "anyStatus": "Any status",
+    "table": "Table",
+    "everyTable": "Every table",
+    "liveCounts": "Live counts",
+    "liveCountsSummary": "{{openOrders}} open orders · {{occupied}} seated · {{needsBill}} waiting on bill · {{products}} menu items · {{customers}} customers",
+    "rangeChip": "Window: {{window}}",
+    "categoryChip": "Category: {{category}}",
+    "methodChip": "Paid by {{method}}",
+    "statusChip": "Orders: {{status}}",
+    "tableChip": "Table: {{table}}"
+  },
+  "liveOrderStatus": {
+    "heading": "Live order status",
+    "statusCount": "{{status}} · {{count}}"
+  },
+  "kpi": {
+    "deltaLabelDays_one": "vs previous day",
+    "deltaLabelDays_other": "vs previous {{count}} days",
+    "deltaLabelWindow": "vs previous window",
+    "revenue": {
+      "title": "Revenue"
+    },
+    "orders": {
+      "title": "Orders"
+    },
+    "avgOrderValue": {
+      "title": "Avg. order value"
+    },
+    "openOrders": {
+      "title": "Open orders",
+      "sub": "not settled yet"
+    },
+    "lowStock": {
+      "title": "Low stock",
+      "subAlert": "at or below par level",
+      "subOk": "everything above par"
+    },
+    "wasteCost": {
+      "title": "Waste cost",
+      "sub": "{{count}} waste events"
+    },
+    "tablesSeated": {
+      "title": "Tables seated",
+      "sub": "{{count}} waiting on bill"
+    },
+    "customers": {
+      "title": "Customers",
+      "sub": "with a phone on file"
+    }
+  },
+  "charts": {
+    "revenueByDay_one": "Revenue by day ({{count}} day)",
+    "revenueByDay_other": "Revenue by day ({{count}} days)",
+    "fullSalesReport": "Full sales report",
+    "paymentMix": "Payment mix",
+    "revenueByCategory": "Revenue by category",
+    "topSellers": "Top sellers",
+    "productPerformance": "Product performance",
+    "unitsSold": "{{count}} sold"
+  },
+  "empty": {
+    "noRevenueTrend": "No settled orders in this window with these filters.",
+    "noPaymentMix": "Nothing collected in this window yet.",
+    "noCategorySales": "No category sales to break down yet.",
+    "noTopSellers": "No sales match the current filters."
+  },
+  "columns": {
+    "table": "Table",
+    "status": "Status",
+    "items": "Items",
+    "total": "Total",
+    "payment": "Payment",
+    "opened": "Opened",
+    "qrOrder": "QR order",
+    "pos": "POS"
+  },
+  "recentOrders": {
+    "heading": "Recent & settled orders",
+    "headingFiltered": "Recent & settled orders · filtered by “{{search}}”",
+    "emptySearchTitle": "No orders match that search",
+    "emptySearchDescription": "Clear the search to see the full recent list.",
+    "emptyTitle": "No orders in this window",
+    "emptyDescription": "Widen the date window or clear the filters to see orders here."
+  },
+  "lowStockWatchlist": {
+    "heading": "Low stock watchlist",
+    "restock": "Restock",
+    "empty": "Everything is above par level.",
+    "more": "+{{count}} more"
+  },
+  "quickLinks": {
+    "sales": {
+      "label": "Sales",
+      "blurb": "Revenue by day and payment mix"
+    },
+    "margins": {
+      "label": "Margins",
+      "blurb": "Food cost vs revenue per item"
+    },
+    "wastage": {
+      "label": "Wastage",
+      "blurb": "What's being thrown out"
+    },
+    "peakHours": {
+      "label": "Peak hours",
+      "blurb": "When service actually happens"
+    }
+  }
+}

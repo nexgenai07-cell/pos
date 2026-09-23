@@ -1,0 +1,311 @@
+{
+  "page": {
+    "menu": {
+      "eyebrow": "Menu",
+      "title": "Menu",
+      "description": "Every product you sell, its price, and whether it's costed. Add, edit or hide items here."
+    },
+    "deals": {
+      "eyebrow": "Menu",
+      "title": "Deals",
+      "description": "Limited-time special prices, active only during specific day+time windows. Everything else keeps its regular price."
+    }
+  },
+  "tabs": {
+    "customerMenu": "Today's customer menu",
+    "categories": "Categories",
+    "dealsTab": "Deals"
+  },
+  "customerMenu": {
+    "heading": "What customers see today ({{weekday}}) on the website & QR menu",
+    "toggleTitle": "Preview what customers see on today's menu",
+    "empty": "Nothing is available today — check availability and day schedules.",
+    "priceLabel": "{{name}} — {{price}}",
+    "dealPriceLabel": "{{name}} — {{original}} → {{price}}"
+  },
+  "filters": {
+    "panelTitle": "Filter the menu",
+    "searchPlaceholder": "Search menu…",
+    "category": {
+      "label": "Category",
+      "all": "All categories"
+    },
+    "availability": {
+      "label": "Availability",
+      "any": "Any",
+      "onMenu": "On menu",
+      "hidden": "Hidden"
+    },
+    "priceRange": {
+      "label": "Price range"
+    },
+    "costRange": {
+      "label": "Cost range"
+    },
+    "priceMin": {
+      "label": "Min price",
+      "placeholder": "0.00"
+    },
+    "priceMax": {
+      "label": "Max price",
+      "placeholder": "99.00"
+    },
+    "badge": {
+      "label": "Badge",
+      "all": "Any badge",
+      "unlimited": "Unlimited",
+      "new": "New",
+      "popular": "Popular",
+      "deal": "Deal",
+      "none": "No badge"
+    },
+    "recipe": {
+      "label": "Recipe",
+      "all": "Any",
+      "with": "Has recipe",
+      "without": "Missing recipe"
+    },
+    "recipeInfo": {
+      "label": "Show recipe info",
+      "hint": "Costs and prep/cook times only — visible to staff, not on the customer menu."
+    },
+    "chips": {
+      "category": "Category: {{name}}",
+      "availability": "Availability: {{value}}",
+      "badge": "Badge: {{value}}",
+      "recipe": "Recipe: {{value}}",
+      "recipeWith": "costed",
+      "recipeWithout": "missing",
+      "priceMin": "Min ${{value}}",
+      "priceMax": "Max ${{value}}"
+    }
+  },
+  "columns": {
+    "name": "Product",
+    "category": "Category",
+    "price": "Price",
+    "cost": "Cost",
+    "margin": "Margin",
+    "availability": "Availability",
+    "days": "Days",
+    "deal": "Deal",
+    "dealPrice": "Deal price",
+    "dealSchedule": "Deal schedule",
+    "regularPrice": "Regular price",
+    "rightNow": "Right now",
+    "recipe": "Recipe"
+  },
+  "availabilityPill": {
+    "onMenu": "On menu",
+    "hidden": "Hidden"
+  },
+  "recipeStatus": {
+    "costed": "Costed",
+    "missing": "Missing"
+  },
+  "badgeRow": {
+    "new": "New item",
+    "popular": "Popular item",
+    "deal": "On a deal"
+  },
+  "delete": {
+    "title": "Delete \"{{name}}\"?",
+    "body": "Its recipe is removed too. This can't be undone.",
+    "buttonTitle": "Delete product"
+  },
+  "menuPage": {
+    "recipeLink": "Recipe",
+    "recipeLinkTitle": "Edit recipe",
+    "csvButton": "CSV",
+    "csvButtonTitle": "Export the filtered menu",
+    "newProductButton": "New product",
+    "toastDeleted": "Product deleted",
+    "emptyFilteredTitle": "No products match",
+    "emptyFilteredDescription": "Loosen a filter or clear the search to see more.",
+    "emptyTitle": "No products yet",
+    "emptyDescription": "Add the first item to your menu.",
+    "footerNote": "Margin uses the recipe cost when one exists, otherwise the product's cost price. Prices here are what POS and the QR menu charge."
+  },
+  "productForm": {
+    "eyebrow": "Menu",
+    "titleNew": "New product",
+    "titleEdit": "Edit product",
+    "back": "Back to menu",
+    "description": "Price, cost and availability here flow straight through to POS and the QR menu.",
+    "loadingTitle": "Loading product…",
+    "loadingBody": "Fetching the current menu item…",
+    "form": {
+      "name": "Product name",
+      "namePlaceholder": "e.g. Shawarma plate",
+      "nameHint": "Shown on the menu, receipts and QR.",
+      "category": {
+        "label": "Category",
+        "placeholder": "Pick a category"
+      },
+      "description": {
+        "label": "Description",
+        "placeholder": "What's in it?"
+      },
+      "price": {
+        "label": "Sell price",
+        "placeholder": "0.00",
+        "hint": "Charged at POS"
+      },
+      "costPrice": {
+        "label": "Cost price",
+        "placeholder": "0.00",
+        "hint": "Used when no recipe exists"
+      },
+      "image": {
+        "label": "Image path",
+        "placeholder": "/burger1.jfif",
+        "hint": "e.g. /burger1.jfif — served from /public",
+        "previewNote": "Preview — the same image is used on the POS grid and QR menu."
+      },
+      "availability": {
+        "label": "Availability",
+        "onMenu": "On menu",
+        "hidden": "Hidden from menu"
+      },
+      "days": {
+        "label": "Available on",
+        "hintEveryDay": "Every day. Pick specific days to make this a day-limited item (e.g. a weekend special).",
+        "hintSpecificDays": "Shows on the customer menu only on: {{days}}.",
+        "everyDay": "Every day",
+        "today": "Today"
+      },
+      "badge": {
+        "label": "Badge",
+        "none": "No badge"
+      },
+      "deal": {
+        "label": "Limited-time deal",
+        "hint": "A special price that only applies during specific day+time windows — everything else shows the regular price.",
+        "toggle": "Run a deal for this item",
+        "price": {
+          "label": "Deal price",
+          "placeholder": "0.00",
+          "hint": "Must be less than the regular sell price."
+        }
+      }
+    },
+    "recipeNote": "Recipe & stock deductions are managed under Inventory → Recipes.",
+    "createButton": "Create product",
+    "errors": {
+      "nameAndCategory": "Name and category are required",
+      "dealWindows": "Add at least one day and time window for the deal, or turn it off"
+    },
+    "toastCreated": "Product created",
+    "toastUpdated": "Product updated",
+    "notFound": {
+      "title": "Product not found",
+      "body": "It may have been deleted from the menu."
+    }
+  },
+  "dealWindows": {
+    "to": "to",
+    "add": "Add day & time",
+    "remove": "Remove this window",
+    "seedStart": "11:00",
+    "seedEnd": "14:00"
+  },
+  "dealsPage": {
+    "back": "Back to menu",
+    "searchPlaceholder": "Search deals…",
+    "active": "Active",
+    "notActive": "Not active",
+    "removeButton": "Remove",
+    "removeTitle": "Remove this deal",
+    "removeConfirm": "Remove the deal on \"{{name}}\"? It goes back to its regular price.",
+    "toastRemoved": "Deal removed",
+    "emptyTitle": "No deals yet",
+    "emptyFilteredTitle": "No deals match",
+    "emptyDescription": "Set up a limited-time special price for a menu item to see it here.",
+    "emptyFilteredDescription": "Try a different search."
+  },
+  "dealFormPage": {
+    "eyebrow": "Menu",
+    "titleNew": "New deal",
+    "titleEditPrefix": "Deal on {{name}}",
+    "description": "A special price active only during the day+time windows below. Outside them, the item shows its regular price.",
+    "back": "Back to deals",
+    "loadingTitle": "Loading deal…",
+    "loadingBody": "Fetching the current deal…",
+    "notFound": {
+      "title": "Deal not found",
+      "body": "It may have already been removed."
+    },
+    "form": {
+      "product": {
+        "label": "Product",
+        "placeholder": "Select a product…"
+      },
+      "price": {
+        "label": "Deal price",
+        "hint": "Must be less than the regular price of {{price}}"
+      },
+      "activeDuring": "Active during"
+    },
+    "errors": {
+      "productRequired": "Pick a product for this deal",
+      "windowsRequired": "Add at least one day and time window"
+    },
+    "createButton": "Create deal",
+    "removeButton": "Remove deal",
+    "removeConfirm": "Remove this deal? The item goes back to its regular price.",
+    "toastCreated": "Deal created",
+    "toastUpdated": "Deal updated",
+    "toastRemoved": "Deal removed"
+  },
+  "categoriesPage": {
+    "eyebrow": "Menu",
+    "title": "Menu categories",
+    "description": "The tabs guests and cashiers see. Sort order controls where each one appears.",
+    "back": "Back to menu",
+    "searchPlaceholder": "Search categories…",
+    "filterTitle": "Filter categories",
+    "usage": {
+      "label": "Usage",
+      "all": "All categories",
+      "populated": "Has products",
+      "empty": "Empty"
+    },
+    "sortBy": {
+      "label": "Sort by",
+      "order": "Menu order",
+      "name": "Name",
+      "products": "Most products"
+    },
+    "showingLabel": "Showing",
+    "showing": "{{shown}} of {{total}} categories shown",
+    "chips": {
+      "usageEmpty": "Usage: empty",
+      "usagePopulated": "Usage: has products",
+      "sortedBy": "Sorted by {{sort}}"
+    },
+    "newCategory": {
+      "label": "New category",
+      "placeholder": "e.g. Desserts",
+      "sortOrderLabel": "Sort order"
+    },
+    "addButton": "Add category",
+    "columns": {
+      "order": "#",
+      "name": "Category",
+      "products": "Products"
+    },
+    "productCountEmpty": "Empty",
+    "productCount_one": "{{count}} item",
+    "productCount_other": "{{count}} items",
+    "deleteConfirm": "Delete category \"{{name}}\"?",
+    "deleteDisabledTitle": "Move its products to another category first",
+    "deleteTitle": "Delete category",
+    "toastCreated": "Category created",
+    "toastUpdated": "Category updated",
+    "toastDeleted": "Category deleted",
+    "emptyFilteredTitle": "No categories match",
+    "emptyFilteredDescription": "Try a different search or clear the filters.",
+    "emptyTitle": "No categories yet",
+    "emptyDescription": "Add a category above, then assign products to it from the menu."
+  }
+}

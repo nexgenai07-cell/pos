@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getTableTurnover, type TableTurnoverRow } from "@/lib/api/reports";
 import { exportToCsv } from "@/lib/csv";
+import { formatNumber } from "@/lib/format";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
 import KpiTile from "@/components/reports/KpiTile";
@@ -11,6 +13,7 @@ import ReportExportBar from "@/components/reports/ReportExportBar";
 import { ReportDateFilterButton, ReportDateFilterPanel, useReportDateRange } from "@/components/reports/ReportDateFilter";
 
 export default function TableTurnoverPage() {
+  const { t } = useTranslation("reports");
   const dateRange = useReportDateRange("report-table-turnover-filters");
   const [rows, setRows] = useState<TableTurnoverRow[]>([]);
   const [overall, setOverall] = useState(0);
@@ -35,8 +38,8 @@ export default function TableTurnoverPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Reports"
-        title="Table turnover"
+        eyebrow={t("page.tableTurnover.eyebrow")}
+        title={t("page.tableTurnover.title")}
         actions={
           <>
             <ReportDateFilterButton state={dateRange} />
@@ -48,13 +51,26 @@ export default function TableTurnoverPage() {
 
       <ReportDateFilterPanel state={dateRange} idPrefix="table-turnover" />
 
-      <div className="mb-5 mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <KpiTile label="Overall average" value={`${overall.toFixed(0)} min`} sub="open → close" />
-        <KpiTile label="Tables tracked" value={String(rows.length)} />
+      <div className="mb-2 mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <KpiTile
+          label={t("kpi.tableTurnover.overallAvg.title")}
+          value={t("charts.minutesUnit", { count: formatNumber(overall, { maximumFractionDigits: 0 }) })}
+          sub={t("kpi.tableTurnover.overallAvg.sub")}
+        />
+        <KpiTile label={t("kpi.tableTurnover.tablesTracked.title")} value={String(rows.length)} sub={t("kpi.tableTurnover.tablesTracked.sub")} />
       </div>
 
-      <ChartWrapper title="Average time held, per table">
-        <SimpleBarChart data={chartData} valueFormatter={(value) => `${value.toFixed(0)}m`} horizontalBars />
+      <p className="mb-5 text-xs text-ink-soft">
+        {t("summary.tableTurnover.overallAvg", { minutes: formatNumber(overall, { maximumFractionDigits: 0 }) })}{" "}
+        {t("summary.tableTurnover.tablesTracked", { count: formatNumber(rows.length) })}
+      </p>
+
+      <ChartWrapper title={t("charts.avgMinutesByTable")}>
+        <SimpleBarChart
+          data={chartData}
+          valueFormatter={(value) => t("charts.minutesUnit", { count: formatNumber(value, { maximumFractionDigits: 0 }) })}
+          horizontalBars
+        />
       </ChartWrapper>
     </AdminShell>
   );

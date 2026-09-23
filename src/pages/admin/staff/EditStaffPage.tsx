@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import type { StaffRole } from "@/types";
 import { getStaffById, updateStaff } from "@/lib/api/staff";
+import { roleLabel } from "@/lib/i18n/labels";
 import { useToast } from "@/components/ui/Toast";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
@@ -23,6 +25,8 @@ export default function EditStaffPage() {
   const [saving, setSaving] = useState(false);
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { t } = useTranslation("staff");
+  const { t: tCommon } = useTranslation("common");
 
   useEffect(() => {
     getStaffById(staffId).then((staff) => {
@@ -42,38 +46,38 @@ export default function EditStaffPage() {
     if (!name.trim() || pin.trim().length < 4) return;
     setSaving(true);
     await updateStaff(staffId, { name: name.trim(), role, pin: pin.trim() });
-    showToast("Staff member updated", "success");
+    showToast(t("edit.toastUpdated"), "success");
     navigate(`/admin/staff/${staffId}`);
   }
 
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Staff"
-        title="Edit staff member"
-        actions={<BackLink to={`/admin/staff/${staffId}`} label="Back to staff member" />}
+        eyebrow={t("eyebrow")}
+        title={t("edit.title")}
+        actions={<BackLink to={`/admin/staff/${staffId}`} label={t("edit.backToStaffMember")} />}
       />
       {loaded && (
         <Card className="max-w-md" padding="lg">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <FormField label="Name" htmlFor="name" required>
+            <FormField label={t("form.name")} htmlFor="name" required>
               <Input id="name" value={name} onChange={(event) => setName(event.target.value)} required />
             </FormField>
-            <FormField label="Role" htmlFor="role">
+            <FormField label={t("form.role")} htmlFor="role">
               <Select id="role" value={role} onChange={(event) => setRole(event.target.value as StaffRole)}>
                 {ROLES.map((option) => (
                   <option key={option} value={option}>
-                    {option}
+                    {roleLabel(tCommon, option)}
                   </option>
                 ))}
               </Select>
             </FormField>
             <FormField
-              label="PIN"
+              label={t("form.pin")}
               htmlFor="pin"
               required
-              error={pinInvalid ? "PIN must be at least 4 digits" : undefined}
-              hint={pinInvalid ? undefined : "4 digits, used for POS login"}
+              error={pinInvalid ? t("form.pinError") : undefined}
+              hint={pinInvalid ? undefined : t("form.pinHint")}
             >
               <Input
                 id="pin"
@@ -87,10 +91,10 @@ export default function EditStaffPage() {
             </FormField>
             <div className="flex items-center gap-3 pt-1">
               <Button type="submit" loading={saving}>
-                Save changes
+                {tCommon("actions.saveChanges")}
               </Button>
               <Button type="button" variant="secondary" onClick={() => navigate(`/admin/staff/${staffId}`)} disabled={saving}>
-                Cancel
+                {tCommon("actions.cancel")}
               </Button>
             </div>
           </form>

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getPeakHours, type PeakHourRow } from "@/lib/api/reports";
 import { exportToCsv } from "@/lib/csv";
+import { formatTime, formatNumber } from "@/lib/format";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
 import { ChartWrapper } from "@/components/reports/ChartWrapper";
@@ -10,12 +12,11 @@ import ReportExportBar from "@/components/reports/ReportExportBar";
 import { ReportDateFilterButton, ReportDateFilterPanel, useReportDateRange } from "@/components/reports/ReportDateFilter";
 
 function formatHour(hour: number): string {
-  const period = hour < 12 ? "am" : "pm";
-  const displayHour = hour % 12 === 0 ? 12 : hour % 12;
-  return `${displayHour}${period}`;
+  return formatTime(`${String(hour).padStart(2, "0")}:00`, { minute: undefined });
 }
 
 export default function PeakHoursPage() {
+  const { t } = useTranslation("reports");
   const dateRange = useReportDateRange("report-peak-hours-filters");
   const [rows, setRows] = useState<PeakHourRow[]>([]);
 
@@ -36,8 +37,8 @@ export default function PeakHoursPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Reports"
-        title="Peak hours"
+        eyebrow={t("page.peakHours.eyebrow")}
+        title={t("page.peakHours.title")}
         actions={
           <>
             <ReportDateFilterButton state={dateRange} />
@@ -51,12 +52,12 @@ export default function PeakHoursPage() {
 
       {busiest && busiest.orders > 0 && (
         <p className="mb-4 text-sm text-ink-soft">
-          Busiest hour: <span className="font-semibold text-ink">{formatHour(busiest.hour)}</span> — {busiest.orders} orders opened.
+          {t("summary.busiestHour", { hour: formatHour(busiest.hour), count: formatNumber(busiest.orders) })}
         </p>
       )}
 
-      <ChartWrapper title="Orders opened, by hour of day">
-        <SimpleBarChart data={chartData} valueFormatter={(value) => `${value} orders`} />
+      <ChartWrapper title={t("charts.ordersByHour")}>
+        <SimpleBarChart data={chartData} valueFormatter={(value) => t("charts.ordersUnit", { count: formatNumber(value) })} />
       </ChartWrapper>
     </AdminShell>
   );

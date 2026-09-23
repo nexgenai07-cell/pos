@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Trash2 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { InventoryItem, RecipeItem } from "@/types";
 import { getProductById, type ProductWithCategory } from "@/lib/api/products";
 import { getInventoryItems } from "@/lib/api/inventory";
@@ -15,6 +16,8 @@ import { DataTableThumbnail } from "@/components/ui/DataTable";
 import { TableContainer, Table, THead, Th, TBody, Tr, Td } from "@/components/ui/Table";
 
 export default function RecipeEditorPage() {
+  const { t } = useTranslation("inventory");
+  const { t: tCommon } = useTranslation("common");
   const { productId = "" } = useParams();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -52,25 +55,25 @@ export default function RecipeEditorPage() {
 
     await setRecipeForProduct(productId, items);
     setSaving(false);
-    showToast("Recipe saved", "success");
+    showToast(t("recipeEditorPage.toastSaved"), "success");
   }
 
   async function handleClear() {
-    if (!window.confirm("Clear this recipe? All ingredient quantities will be removed.")) return;
+    if (!window.confirm(t("recipeEditorPage.confirmClear"))) return;
     setClearing(true);
     await setRecipeForProduct(productId, []);
     setQuantities({});
     setClearing(false);
-    showToast("Recipe cleared", "success");
+    showToast(t("recipeEditorPage.toastCleared"), "success");
   }
 
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Inventory · Recipe"
-        title={product ? product.name : "Recipe"}
-        description="Set the ingredients and quantities this product deducts from stock when sent to the kitchen."
-        actions={<BackLink to="/admin/inventory/recipes" label="Back to recipes" />}
+        eyebrow={t("recipeEditorPage.eyebrow")}
+        title={product ? product.name : t("recipeEditorPage.fallbackTitle")}
+        description={t("recipeEditorPage.description")}
+        actions={<BackLink to="/admin/inventory/recipes" label={t("recipeEditorPage.backToRecipes")} />}
       />
 
       {product && (
@@ -86,8 +89,8 @@ export default function RecipeEditorPage() {
       <TableContainer className="max-w-xl">
         <Table>
           <THead>
-            <Th>Ingredient</Th>
-            <Th>Quantity per order</Th>
+            <Th>{t("recipeEditorPage.colIngredient")}</Th>
+            <Th>{t("recipeEditorPage.colQuantityPerOrder")}</Th>
           </THead>
           <TBody>
             {inventoryItems.map((item) => (
@@ -114,15 +117,15 @@ export default function RecipeEditorPage() {
 
       <div className="mt-5 flex items-center gap-3">
         <Button onClick={handleSave} loading={saving}>
-          Save recipe
+          {t("recipeEditorPage.saveRecipe")}
         </Button>
         <Button variant="secondary" onClick={() => navigate("/admin/inventory/recipes")}>
-          Cancel
+          {tCommon("actions.cancel")}
         </Button>
         {hasRecipe && (
           <Button variant="danger" onClick={handleClear} loading={clearing} className="ms-auto">
             <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
-            Clear recipe
+            {t("recipeEditorPage.clearRecipe")}
           </Button>
         )}
       </div>

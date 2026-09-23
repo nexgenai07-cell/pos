@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { PieChart } from "lucide-react";
 import { getMargins, type MarginRow } from "@/lib/api/reports";
 import { exportToCsv } from "@/lib/csv";
+import { formatCurrency, formatNumber } from "@/lib/format";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
 import KpiTile from "@/components/reports/KpiTile";
@@ -12,6 +14,7 @@ import ReportExportBar from "@/components/reports/ReportExportBar";
 import { ReportDateFilterButton, ReportDateFilterPanel, useReportDateRange } from "@/components/reports/ReportDateFilter";
 
 export default function MarginsPage() {
+  const { t } = useTranslation("reports");
   const dateRange = useReportDateRange("report-margins-filters");
   const [rows, setRows] = useState<MarginRow[] | null>(null);
   const [blended, setBlended] = useState(0);
@@ -36,44 +39,44 @@ export default function MarginsPage() {
   const columns: DataTableColumn<MarginRow>[] = [
     {
       key: "name",
-      header: "Product",
+      header: t("columns.margins.product"),
       sortable: true,
       accessor: (row) => row.name,
       render: (row) => <span className="font-medium text-ink">{row.name}</span>,
     },
     {
       key: "revenue",
-      header: "Revenue",
+      header: t("columns.margins.revenue"),
       sortable: true,
       align: "right",
       accessor: (row) => row.revenue,
-      render: (row) => <span className="tabular-nums text-ink-soft">${row.revenue.toFixed(2)}</span>,
+      render: (row) => <span className="tabular-nums text-ink-soft">{formatCurrency(row.revenue)}</span>,
     },
     {
       key: "cost",
-      header: "Cost",
+      header: t("columns.margins.cost"),
       sortable: true,
       align: "right",
       accessor: (row) => row.cost,
-      render: (row) => <span className="tabular-nums text-ink-soft">${row.cost.toFixed(2)}</span>,
+      render: (row) => <span className="tabular-nums text-ink-soft">{formatCurrency(row.cost)}</span>,
     },
     {
       key: "margin",
-      header: "Margin",
+      header: t("columns.margins.margin"),
       sortable: true,
       align: "right",
       accessor: (row) => row.marginAmount,
-      render: (row) => <span className="tabular-nums text-ink">${row.marginAmount.toFixed(2)}</span>,
+      render: (row) => <span className="tabular-nums text-ink">{formatCurrency(row.marginAmount)}</span>,
     },
     {
       key: "marginPct",
-      header: "Margin %",
+      header: t("columns.margins.marginPct"),
       sortable: true,
       align: "right",
       accessor: (row) => row.marginPct,
       render: (row) => (
         <StatusPill
-          label={`${row.marginPct.toFixed(0)}%`}
+          label={`${formatNumber(row.marginPct, { maximumFractionDigits: 0 })}%`}
           tone={row.marginPct >= 60 ? "good" : row.marginPct >= 40 ? "accent" : "warn"}
         />
       ),
@@ -83,8 +86,8 @@ export default function MarginsPage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Reports"
-        title="Food cost & margin"
+        eyebrow={t("page.margins.eyebrow")}
+        title={t("page.margins.title")}
         actions={
           <>
             <ReportDateFilterButton state={dateRange} />
@@ -97,9 +100,21 @@ export default function MarginsPage() {
       <ReportDateFilterPanel state={dateRange} idPrefix="margins" />
 
       <div className="mb-5 mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        <KpiTile label="Blended margin" value={`${blended.toFixed(1)}%`} />
-        <KpiTile label="Total revenue" value={`$${(rows ?? []).reduce((s, r) => s + r.revenue, 0).toFixed(2)}`} />
-        <KpiTile label="Total food cost" value={`$${(rows ?? []).reduce((s, r) => s + r.cost, 0).toFixed(2)}`} />
+        <KpiTile
+          label={t("kpi.margins.grossMargin.title")}
+          sub={t("kpi.margins.grossMargin.sub")}
+          value={`${formatNumber(blended, { maximumFractionDigits: 1 })}%`}
+        />
+        <KpiTile
+          label={t("kpi.margins.revenue.title")}
+          sub={t("kpi.margins.revenue.sub")}
+          value={formatCurrency((rows ?? []).reduce((s, r) => s + r.revenue, 0))}
+        />
+        <KpiTile
+          label={t("kpi.margins.foodCost.title")}
+          sub={t("kpi.margins.foodCost.sub")}
+          value={formatCurrency((rows ?? []).reduce((s, r) => s + r.cost, 0))}
+        />
       </div>
 
       <DataTable
@@ -107,8 +122,8 @@ export default function MarginsPage() {
         data={rows}
         keyField={(row) => row.productId}
         emptyIcon={PieChart}
-        emptyTitle="No sales yet"
-        emptyDescription="Margins are calculated from closed orders."
+        emptyTitle={t("empty.noMarginSales.title")}
+        emptyDescription={t("empty.noMarginSales.description")}
       />
     </AdminShell>
   );

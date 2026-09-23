@@ -1,0 +1,67 @@
+{
+  "eyebrow": "الموظفون",
+  "cantRemoveSelf": "لا يمكنك إزالة حسابك الخاص",
+  "confirmDelete": "إزالة \"{{name}}\" من الموظفين؟ لا يمكن التراجع عن هذا الإجراء.",
+  "toastRemoved": "تمت إزالة عضو الفريق",
+  "backToTeam": "الرجوع إلى الفريق",
+
+  "list": {
+    "title": "الفريق",
+    "description": "كل من لديه حساب في هذا الفرع.",
+    "searchPlaceholder": "ابحث بالاسم…",
+    "newStaffMember": "عضو فريق جديد",
+    "roleAccessTitle": "ما يمكن لكل دور الوصول إليه",
+    "filterTitle": "تصفية الفريق",
+    "roleLabel": "الدور",
+    "allRoles": "جميع الأدوار",
+    "sortBy": "ترتيب حسب",
+    "sortName": "الاسم",
+    "sortRole": "الدور",
+    "showing": "العرض",
+    "summary": "تظهر {{shown}} من {{total}} من أعضاء الفريق",
+    "chipRole": "الدور: {{role}}",
+    "chipSortedByRole": "مرتب حسب الدور",
+    "colName": "الاسم",
+    "colRole": "الدور",
+    "view": "عرض",
+    "emptyFilteredTitle": "لا يوجد موظفون مطابقون",
+    "emptyFilteredDescription": "جرّب بحثاً آخر أو امسح عوامل التصفية.",
+    "emptyTitle": "لا يوجد موظفون بعد",
+    "emptyDescription": "أضف أول عضو في فريقك للبدء."
+  },
+
+  "form": {
+    "name": "الاسم",
+    "role": "الدور",
+    "pin": "الرقم السري",
+    "pinError": "يجب أن يتكون الرقم السري من 4 أرقام على الأقل",
+    "pinHint": "4 أرقام، تُستخدم لتسجيل الدخول في نقطة البيع"
+  },
+
+  "new": {
+    "title": "عضو فريق جديد",
+    "description": "أنشئ حساب دخول لعضو فريق جديد.",
+    "submit": "حفظ عضو الفريق",
+    "toastAdded": "تمت إضافة عضو الفريق"
+  },
+
+  "edit": {
+    "title": "تعديل عضو الفريق",
+    "backToStaffMember": "الرجوع إلى عضو الفريق",
+    "toastUpdated": "تم تحديث عضو الفريق"
+  },
+
+  "detail": {
+    "fallbackTitle": "عضو الفريق",
+    "onShift": "في الدوام",
+    "clockIn": "تسجيل الحضور",
+    "clockOut": "تسجيل الانصراف",
+    "toastClockedIn": "تم تسجيل الحضور",
+    "toastClockedOut": "تم تسجيل الانصراف",
+    "colClockIn": "وقت الحضور",
+    "colClockOut": "وقت الانصراف",
+    "colDuration": "المدة",
+    "emptyTitle": "لا توجد ورديات مسجلة بعد",
+    "emptyDescription": "سجّل الحضور لبدء تتبع الساعات."
+  }
+}

@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Plus, X } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { InventoryItem, PurchaseStatus, Supplier } from "@/types";
 import { getInventoryItems } from "@/lib/api/inventory";
 import { getSuppliers } from "@/lib/api/suppliers";
 import { getPurchaseById, updatePurchase } from "@/lib/api/purchases";
+import { formatCurrency } from "@/lib/format";
+import { purchaseStatusLabel } from "@/lib/i18n/labels";
 import { errorMessage } from "@/lib/errors";
 import { useToast } from "@/components/ui/Toast";
 import AdminShell from "@/components/ui/AdminShell";
@@ -24,6 +27,8 @@ interface Line {
 }
 
 export default function EditPurchasePage() {
+  const { t } = useTranslation("inventory");
+  const { t: tCommon } = useTranslation("common");
   const { purchaseId = "" } = useParams();
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -87,14 +92,14 @@ export default function EditPurchasePage() {
       }));
 
     if (!supplierId || !items.length) {
-      showToast("Pick a supplier and at least one line item", "error");
+      showToast(t("purchaseForm.toastValidationError"), "error");
       return;
     }
 
     setSaving(true);
     try {
       await updatePurchase(purchaseId, { supplierId, items, status });
-      showToast("Purchase order updated", "success");
+      showToast(t("editPurchasePage.toastUpdated"), "success");
       navigate("/admin/inventory/purchases");
     } catch (error) {
       showToast(errorMessage(error), "error");
@@ -104,7 +109,7 @@ export default function EditPurchasePage() {
   if (loading) {
     return (
       <AdminShell>
-        <PageHeader eyebrow="Inventory · Purchases" title="Loading purchase order…" />
+        <PageHeader eyebrow={t("editPurchasePage.eyebrow")} title={t("editPurchasePage.loadingTitle")} />
       </AdminShell>
     );
   }
@@ -113,10 +118,10 @@ export default function EditPurchasePage() {
     return (
       <AdminShell>
         <PageHeader
-          eyebrow="Inventory · Purchases"
-          title="Purchase order not found"
-          description="It may have been deleted."
-          actions={<BackLink to="/admin/inventory/purchases" label="Back to purchases" />}
+          eyebrow={t("editPurchasePage.eyebrow")}
+          title={t("editPurchasePage.notFoundTitle")}
+          description={t("editPurchasePage.notFoundDescription")}
+          actions={<BackLink to="/admin/inventory/purchases" label={t("purchaseForm.backToPurchases")} />}
         />
       </AdminShell>
     );
@@ -127,24 +132,23 @@ export default function EditPurchasePage() {
   return (
     <AdminShell>
       <PageHeader
-        eyebrow="Inventory · Purchases"
-        title={`Edit ${orderReference}`}
-        description={
-          locked
-            ? "This order has already been received, so its lines are locked."
-            : "Change the supplier, quantities or status while stock hasn't arrived yet."
-        }
+        eyebrow={t("editPurchasePage.eyebrow")}
+        title={t("editPurchasePage.titleFormat", { reference: orderReference })}
+        description={locked ? t("editPurchasePage.descriptionLocked") : t("editPurchasePage.descriptionUnlocked")}
         actions={
           <>
-            <StatusPill label={status} tone={status === "received" ? "good" : status === "ordered" ? "accent" : "neutral"} />
-            <BackLink to="/admin/inventory/purchases" label="Back to purchases" />
+            <StatusPill
+              label={purchaseStatusLabel(tCommon, status)}
+              tone={status === "received" ? "good" : status === "ordered" ? "accent" : "neutral"}
+            />
+            <BackLink to="/admin/inventory/purchases" label={t("purchaseForm.backToPurchases")} />
           </>
         }
       />
 
       <form onSubmit={handleSubmit} className="max-w-2xl space-y-5">
         <div className="grid gap-4 sm:grid-cols-2">
-          <FormField label="Supplier" htmlFor="edit-po-supplier">
+          <FormField label={t("purchaseForm.supplierLabel")} htmlFor="edit-po-supplier">
             <Select
               id="edit-po-supplier"
               value={supplierId}
@@ -159,24 +163,24 @@ export default function EditPurchasePage() {
             </Select>
           </FormField>
 
-          <FormField label="Status" htmlFor="edit-po-status" hint="Draft stays internal until you order it">
+          <FormField label={t("purchaseForm.statusLabel")} htmlFor="edit-po-status" hint={t("purchaseForm.statusHint")}>
             <Select
               id="edit-po-status"
               value={status}
               onChange={(event) => setStatus(event.target.value as PurchaseStatus)}
               disabled={locked}
             >
-              <option value="draft">Draft</option>
-              <option value="ordered">Ordered</option>
+              <option value="draft">{purchaseStatusLabel(tCommon, "draft")}</option>
+              <option value="ordered">{purchaseStatusLabel(tCommon, "ordered")}</option>
             </Select>
           </FormField>
         </div>
 
         <Card>
           <div className="mb-3 flex items-center justify-between gap-3">
-            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">Line items</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-ink-soft">{t("purchaseForm.lineItemsLabel")}</p>
             <p className="text-xs text-ink-soft">
-              Order total <span className="font-semibold tabular-nums text-ink">${total.toFixed(2)}</span>
+              {t("purchaseForm.orderTotalLabel")} <span className="font-semibold tabular-nums text-ink">{formatCurrency(total)}</span>
             </p>
           </div>
 
@@ -191,14 +195,14 @@ export default function EditPurchasePage() {
                 >
                   {inventoryItems.map((item) => (
                     <option key={item.id} value={item.id}>
-                      {item.name} ({item.unit})
+                      {t("purchaseForm.itemUnitFormat", { name: item.name, unit: item.unit })}
                     </option>
                   ))}
                 </Select>
                 <Input
                   type="number"
                   min="0"
-                  placeholder="quantity"
+                  placeholder={t("purchaseForm.quantityPlaceholder")}
                   value={line.quantity}
                   onChange={(event) => updateLine(index, { quantity: event.target.value })}
                   className="w-24 py-1.5!"
@@ -208,7 +212,7 @@ export default function EditPurchasePage() {
                   type="number"
                   min="0"
                   step="0.001"
-                  placeholder="unit cost"
+                  placeholder={t("purchaseForm.unitCostPlaceholder")}
                   value={line.unitCost}
                   onChange={(event) => updateLine(index, { unitCost: event.target.value })}
                   className="w-24 py-1.5!"
@@ -218,7 +222,7 @@ export default function EditPurchasePage() {
                   <button
                     type="button"
                     onClick={() => removeLine(index)}
-                    aria-label="Remove line"
+                    aria-label={t("purchaseForm.removeLineAria")}
                     className="flex h-8 w-8 flex-none items-center justify-center rounded-lg text-ink-soft transition-colors hover:bg-status-danger/10 hover:text-status-danger"
                   >
                     <X className="h-4 w-4" strokeWidth={2} />
@@ -235,23 +239,19 @@ export default function EditPurchasePage() {
               className="mt-3 flex items-center gap-1.5 text-sm font-medium text-accent hover:text-accent-hover"
             >
               <Plus className="h-3.5 w-3.5" strokeWidth={2.25} />
-              Add line
+              {t("purchaseForm.addLine")}
             </button>
           )}
         </Card>
 
         <div className="flex items-center gap-3">
           <Button type="submit" loading={saving} disabled={locked}>
-            Save changes
+            {tCommon("actions.saveChanges")}
           </Button>
           <Button type="button" variant="secondary" onClick={() => navigate("/admin/inventory/purchases")} disabled={saving}>
-            Cancel
+            {tCommon("actions.cancel")}
           </Button>
-          {locked && (
-            <p className="text-xs text-ink-soft">
-              Received orders are immutable — the stock movements they created are already on the books.
-            </p>
-          )}
+          {locked && <p className="text-xs text-ink-soft">{t("purchaseForm.lockedNote")}</p>}
         </div>
       </form>
     </AdminShell>

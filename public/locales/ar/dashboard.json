@@ -1,0 +1,140 @@
+{
+  "page": {
+    "eyebrow": "الرئيسية",
+    "title": "نظرة سريعة",
+    "description": "{{from}} – {{to}} · مقارنة بـ {{prevFrom}} – {{prevTo}}",
+    "loading": "جارٍ تحميل آخر الأرقام…"
+  },
+  "actions": {
+    "searchPlaceholder": "ابحث في الطلبات…",
+    "exportTitle": "تصدير الطلبات المُصفّاة",
+    "exportCsv": "CSV",
+    "refresh": "تحديث",
+    "allReports": "كل التقارير"
+  },
+  "filters": {
+    "panelTitle": "تصفية كل شيء في هذه الصفحة",
+    "window": "النافذة",
+    "from": "من",
+    "fromHint": "يتجاوز الإعداد المسبق",
+    "to": "إلى",
+    "category": "الفئة",
+    "allCategories": "كل الفئات",
+    "paymentMethod": "طريقة الدفع",
+    "anyMethod": "أي طريقة",
+    "orderStatus": "حالة الطلب",
+    "anyStatus": "أي حالة",
+    "table": "الطاولة",
+    "everyTable": "كل الطاولات",
+    "liveCounts": "أرقام حية",
+    "liveCountsSummary": "{{openOrders}} طلب مفتوح · {{occupied}} طاولة مشغولة · {{needsBill}} بانتظار الفاتورة · {{products}} صنف بالقائمة · {{customers}} عميل",
+    "rangeChip": "النافذة: {{window}}",
+    "categoryChip": "الفئة: {{category}}",
+    "methodChip": "الدفع عبر {{method}}",
+    "statusChip": "الطلبات: {{status}}",
+    "tableChip": "الطاولة: {{table}}"
+  },
+  "liveOrderStatus": {
+    "heading": "حالة الطلبات الحية",
+    "statusCount": "{{status}} · {{count}}"
+  },
+  "kpi": {
+    "deltaLabelDays_one": "مقارنة باليوم السابق",
+    "deltaLabelDays_two": "مقارنة باليومين السابقين",
+    "deltaLabelDays_few": "مقارنة بآخر {{count}} أيام",
+    "deltaLabelDays_many": "مقارنة بآخر {{count}} يوماً",
+    "deltaLabelDays_other": "مقارنة بآخر {{count}} يوم",
+    "deltaLabelWindow": "مقارنة بالفترة السابقة",
+    "revenue": {
+      "title": "الإيرادات"
+    },
+    "orders": {
+      "title": "الطلبات"
+    },
+    "avgOrderValue": {
+      "title": "متوسط قيمة الطلب"
+    },
+    "openOrders": {
+      "title": "طلبات مفتوحة",
+      "sub": "لم تُسوَّ بعد"
+    },
+    "lowStock": {
+      "title": "مخزون منخفض",
+      "subAlert": "عند حد الطلب الأدنى أو أقل",
+      "subOk": "كل شيء فوق الحد الأدنى"
+    },
+    "wasteCost": {
+      "title": "تكلفة الهدر",
+      "sub": "{{count}} حركة هدر"
+    },
+    "tablesSeated": {
+      "title": "طاولات مشغولة",
+      "sub": "{{count}} بانتظار الفاتورة"
+    },
+    "customers": {
+      "title": "العملاء",
+      "sub": "لديهم رقم هاتف مسجَّل"
+    }
+  },
+  "charts": {
+    "revenueByDay_one": "الإيرادات اليومية (آخر يوم)",
+    "revenueByDay_two": "الإيرادات اليومية (آخر يومين)",
+    "revenueByDay_few": "الإيرادات اليومية (آخر {{count}} أيام)",
+    "revenueByDay_many": "الإيرادات اليومية (آخر {{count}} يوماً)",
+    "revenueByDay_other": "الإيرادات اليومية (آخر {{count}} يوم)",
+    "fullSalesReport": "تقرير المبيعات الكامل",
+    "paymentMix": "خلط طرق الدفع",
+    "revenueByCategory": "الإيرادات حسب الفئة",
+    "topSellers": "الأكثر مبيعاً",
+    "productPerformance": "أداء المنتجات",
+    "unitsSold": "بيع {{count}}"
+  },
+  "empty": {
+    "noRevenueTrend": "لا طلبات مسوّاة في هذه النافذة بهذه الفلاتر.",
+    "noPaymentMix": "لم يُحصَّل شيء في هذه النافذة بعد.",
+    "noCategorySales": "لا مبيعات لتفصيلها حسب الفئة بعد.",
+    "noTopSellers": "لا مبيعات تطابق الفلاتر الحالية."
+  },
+  "columns": {
+    "table": "الطاولة",
+    "status": "الحالة",
+    "items": "الأصناف",
+    "total": "الإجمالي",
+    "payment": "الدفع",
+    "opened": "وقت الفتح",
+    "qrOrder": "طلب عبر QR",
+    "pos": "نقطة البيع"
+  },
+  "recentOrders": {
+    "heading": "الطلبات الأخيرة والمسوّاة",
+    "headingFiltered": "الطلبات الأخيرة والمسوّاة · مصفّاة حسب “{{search}}”",
+    "emptySearchTitle": "لا طلبات مطابقة لهذا البحث",
+    "emptySearchDescription": "أزل البحث لترى القائمة الكاملة الأخيرة.",
+    "emptyTitle": "لا طلبات في هذه النافذة",
+    "emptyDescription": "وسّع النافذة الزمنية أو أزل الفلاتر لترى الطلبات هنا."
+  },
+  "lowStockWatchlist": {
+    "heading": "قائمة المراقبة للمخزون المنخفض",
+    "restock": "إعادة التوريد",
+    "empty": "كل شيء فوق حد الطلب الأدنى.",
+    "more": "+{{count}} أخرى"
+  },
+  "quickLinks": {
+    "sales": {
+      "label": "المبيعات",
+      "blurb": "الإيرادات اليومية وخلط طرق الدفع"
+    },
+    "margins": {
+      "label": "الهامش",
+      "blurb": "تكلفة الطعام مقابل الإيرادات لكل صنف"
+    },
+    "wastage": {
+      "label": "الهدر",
+      "blurb": "ما الذي يُرمى"
+    },
+    "peakHours": {
+      "label": "ساعات الذروة",
+      "blurb": "متى تنشط الخدمة فعلياً"
+    }
+  }
+}
