@@ -71,6 +71,12 @@
     "cashier": "Cashier",
     "kitchen": "Kitchen"
   },
+  "roleSummary": {
+    "owner": "Full access — admin dashboard, POS and kitchen display.",
+    "manager": "Full access — admin dashboard, POS and kitchen display.",
+    "cashier": "POS only — tables, orders and payments. Can't open the kitchen display or admin.",
+    "kitchen": "Kitchen display only — the order queue. Can't open POS, payments or admin."
+  },
   "badge": {
     "new": "New",
     "popular": "Popular",

@@ -9,7 +9,9 @@ import type {
   StockMovementReason,
   TableStatus,
 } from "@/types";
-import type { Weekday } from "@/lib/weekday";
+import { WEEKDAYS, type Weekday } from "@/lib/weekday";
+import type { Deal } from "@/lib/deals";
+import { formatTime } from "@/lib/format";
 
 /**
  * The app models statuses, roles and badges as string unions, so their values
@@ -125,3 +127,37 @@ export function paymentMethodLabel(t: TFunction<"common">, method: PaymentMethod
 export function weekdayLabel(t: TFunction<"common">, day: Weekday): string {
   return t(WEEKDAY_KEY[day]);
 }
+
+const ROLE_SUMMARY_KEY = {
+  owner: "roleSummary.owner",
+  manager: "roleSummary.manager",
+  cashier: "roleSummary.cashier",
+  kitchen: "roleSummary.kitchen",
+} as const satisfies Record<StaffRole, string>;
+
+/** The per-role permission blurb shown on the staff page — see common:roleSummary. */
+export function roleSummaryLabel(t: TFunction<"common">, role: StaffRole): string {
+  return t(ROLE_SUMMARY_KEY[role]);
+}
+
+/**
+ * "Daily" / "Fri, Sat, Sun" for UI. Locale-aware twin of weekday.ts's
+ * describeDays(), which keeps its English output for CSV export (localized
+ * exports arrive with the Phase 5 BOM fix).
+ */
+export function describeDaysLabel(t: TFunction<"common">, days: Weekday[] | undefined): string {
+  if (!days || days.length === 0 || days.length === 7) return t("time.daily");
+  return [...days]
+    .sort((a, b) => WEEKDAYS.indexOf(a) - WEEKDAYS.indexOf(b))
+    .map((day) => weekdayLabel(t, day))
+    .join(", ");
+}
+
+/** "Fri 11:00 AM–2:00 PM" for UI — twin of deals.ts's describeDeal() (CSV keeps English). */
+export function describeDealLabel(t: TFunction<"common">, deal: Deal | undefined): string {
+  if (!deal || deal.windows.length === 0) return "";
+  return deal.windows
+    .map((window) => `${weekdayLabel(t, window.day)} ${formatTime(window.startTime)}–${formatTime(window.endTime)}`)
+    .join(", ");
+}
+

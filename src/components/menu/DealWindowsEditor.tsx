@@ -1,5 +1,7 @@
 import { Plus, Trash2 } from "lucide-react";
-import { WEEKDAYS, WEEKDAY_LABELS, todayWeekday, type Weekday } from "@/lib/weekday";
+import { WEEKDAYS, todayWeekday, type Weekday } from "@/lib/weekday";
+import { weekdayLabel } from "@/lib/i18n/labels";
+import { useTranslation } from "react-i18next";
 import type { DealWindow } from "@/lib/deals";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -13,6 +15,7 @@ export default function DealWindowsEditor({
   windows: DealWindow[];
   onChange: (next: DealWindow[]) => void;
 }) {
+  const { t } = useTranslation("common");
   return (
     <div className="space-y-2">
       {windows.map((window, index) => (
@@ -26,7 +29,7 @@ export default function DealWindowsEditor({
           >
             {WEEKDAYS.map((day) => (
               <option key={day} value={day}>
-                {WEEKDAY_LABELS[day]}
+                {weekdayLabel(t, day)}
               </option>
             ))}
           </Select>

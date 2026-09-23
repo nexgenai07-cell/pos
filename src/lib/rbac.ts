@@ -33,9 +33,3 @@ export function landingPathFor(role: StaffRole): string {
   return "/admin/dashboard"; // manager, owner
 }
 
-export const ROLE_SUMMARY: Record<StaffRole, string> = {
-  owner: "Full access — admin dashboard, POS and kitchen display.",
-  manager: "Full access — admin dashboard, POS and kitchen display.",
-  cashier: "POS only — tables, orders and payments. Can't open the kitchen display or admin.",
-  kitchen: "Kitchen display only — the order queue. Can't open POS, payments or admin.",
-};

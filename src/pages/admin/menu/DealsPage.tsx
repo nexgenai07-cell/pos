@@ -2,7 +2,9 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Pencil, Percent, Trash2 } from "lucide-react";
 import { getDeals, removeProductDeal, type DealRow } from "@/lib/api/products";
-import { activeDealPrice, describeDeal } from "@/lib/deals";
+import { activeDealPrice } from "@/lib/deals";
+import { describeDealLabel } from "@/lib/i18n/labels";
+import { useTranslation } from "react-i18next";
 import { on } from "@/lib/eventBus";
 import { matchesSearch } from "@/lib/filters";
 import { errorMessage } from "@/lib/errors";
@@ -20,6 +22,7 @@ export default function DealsPage() {
   const [search, setSearch] = useState("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const { showToast } = useToast();
+  const { t } = useTranslation("common");
 
   const refresh = useCallback(() => {
     getDeals().then(setDeals);
@@ -84,8 +87,8 @@ export default function DealsPage() {
     {
       key: "schedule",
       header: "Schedule",
-      accessor: (row) => describeDeal(row.deal),
-      render: (row) => <span className="text-xs text-ink-soft">{describeDeal(row.deal)}</span>,
+      accessor: (row) => describeDealLabel(t, row.deal),
+      render: (row) => <span className="text-xs text-ink-soft">{describeDealLabel(t, row.deal)}</span>,
     },
     {
       key: "active",

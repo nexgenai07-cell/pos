@@ -6,7 +6,8 @@ import { deleteStaff, getStaffList } from "@/lib/api/staff";
 import { useAuth } from "@/context/AuthContext";
 import { countActiveFilters, matchesSearch } from "@/lib/filters";
 import { errorMessage } from "@/lib/errors";
-import { ROLE_SUMMARY } from "@/lib/rbac";
+import { roleLabel, roleSummaryLabel } from "@/lib/i18n/labels";
+import { useTranslation } from "react-i18next";
 import { useToast } from "@/components/ui/Toast";
 import AdminShell from "@/components/ui/AdminShell";
 import PageHeader from "@/components/ui/PageHeader";
@@ -38,6 +39,7 @@ export default function StaffListPage() {
   const { staff: currentStaff } = useAuth();
   const { showToast } = useToast();
   const { open, toggle } = useFilterPanelState("staff-filters");
+  const { t } = useTranslation("common");
 
   const refresh = useCallback(() => {
     getStaffList().then(setStaffList);
@@ -160,8 +162,8 @@ export default function StaffListPage() {
         <dl className="grid gap-2 sm:grid-cols-2">
           {ROLES.map((role) => (
             <div key={role} className="flex items-start gap-2">
-              <StatusPill label={role} tone="accent" />
-              <dd className="text-xs text-ink-soft">{ROLE_SUMMARY[role]}</dd>
+              <StatusPill label={roleLabel(t, role)} tone="accent" />
+              <dd className="text-xs text-ink-soft">{roleSummaryLabel(t, role)}</dd>
             </div>
           ))}
         </dl>

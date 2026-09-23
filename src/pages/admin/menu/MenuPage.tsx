@@ -10,6 +10,8 @@ import { countActiveFilters, matchesSearch } from "@/lib/filters";
 import { errorMessage } from "@/lib/errors";
 import { describeDays, WEEKDAY_LABELS, todayWeekday } from "@/lib/weekday";
 import { describeDeal } from "@/lib/deals";
+import { describeDaysLabel, describeDealLabel } from "@/lib/i18n/labels";
+import { useTranslation } from "react-i18next";
 import { formatCurrency } from "@/lib/format";
 import { useToast } from "@/components/ui/Toast";
 import AdminShell from "@/components/ui/AdminShell";
@@ -52,6 +54,7 @@ export default function MenuPage() {
 
   const { open, toggle } = useFilterPanelState("menu-filters");
   const { showToast } = useToast();
+  const { t } = useTranslation("common");
 
   const refresh = useCallback(() => {
     getProducts().then(setProducts);
@@ -234,10 +237,10 @@ export default function MenuPage() {
       key: "days",
       header: "Days",
       sortable: true,
-      accessor: (product) => describeDays(product.days),
+      accessor: (product) => describeDaysLabel(t, product.days),
       render: (product) => (
         <StatusPill
-          label={describeDays(product.days)}
+          label={describeDaysLabel(t, product.days)}
           tone={product.days && product.days.length > 0 ? "info" : "neutral"}
           size="sm"
         />
@@ -250,7 +253,7 @@ export default function MenuPage() {
       render: (product) =>
         product.deal ? (
           <StatusPill
-            label={`${formatCurrency(product.deal.price)} · ${describeDeal(product.deal)}`}
+            label={`${formatCurrency(product.deal.price)} · ${describeDealLabel(t, product.deal)}`}
             tone="warn"
             size="sm"
           />

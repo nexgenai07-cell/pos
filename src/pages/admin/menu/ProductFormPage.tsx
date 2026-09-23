@@ -3,6 +3,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { Category } from "@/types";
 import { createProduct, getCategories, getProductById, updateProduct, type ProductInput } from "@/lib/api/products";
 import { WEEKDAYS, WEEKDAY_LABELS, todayWeekday, type Weekday } from "@/lib/weekday";
+import { weekdayLabel } from "@/lib/i18n/labels";
+import { useTranslation } from "react-i18next";
 import type { DealWindow } from "@/lib/deals";
 import { errorMessage } from "@/lib/errors";
 import DealWindowsEditor from "@/components/menu/DealWindowsEditor";
@@ -28,6 +30,7 @@ export default function ProductFormPage() {
   const isEdit = Boolean(productId);
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { t } = useTranslation("common");
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [name, setName] = useState("");
@@ -201,7 +204,7 @@ export default function ProductFormPage() {
                     } ${day === todayWeekday() ? "ring-1 ring-inset ring-accent/30" : ""}`}
                     title={day === todayWeekday() ? "Today" : undefined}
                   >
-                    {WEEKDAY_LABELS[day]}
+                    {weekdayLabel(t, day)}
                   </button>
                 );
               })}
