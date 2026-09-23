@@ -9,6 +9,8 @@ import PageHeader from "@/components/ui/PageHeader";
 import StatusPill from "@/components/ui/StatusPill";
 import EmptyState from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { tableStatusLabel } from "@/lib/i18n/labels";
+import { useTranslation } from "react-i18next";
 
 const STATUS_TONE: Record<TableStatus, "neutral" | "accent" | "warn"> = {
   empty: "neutral",
@@ -16,11 +18,8 @@ const STATUS_TONE: Record<TableStatus, "neutral" | "accent" | "warn"> = {
   "needs-bill": "warn",
 };
 
-const STATUS_LABEL: Record<TableStatus, string> = {
-  empty: "Empty",
-  occupied: "Occupied",
-  "needs-bill": "Needs bill",
-};
+/** Legend + tile order — labels come from common:status via tableStatusLabel(). */
+const LEGEND_STATUSES: TableStatus[] = ["empty", "occupied", "needs-bill"];
 
 const STATUS_DOT: Record<TableStatus, string> = {
   empty: "bg-status-empty",
@@ -31,6 +30,8 @@ const STATUS_DOT: Record<TableStatus, string> = {
 export default function TableMapPage() {
   const [tables, setTables] = useState<Table[] | null>(null);
   const navigate = useNavigate();
+  const { t } = useTranslation("pos");
+  const { t: tCommon } = useTranslation("common");
 
   const refresh = useCallback(() => {
     getTables().then(setTables);
@@ -57,14 +58,14 @@ export default function TableMapPage() {
   return (
     <AdminShell fitScreen>
       <PageHeader
-        eyebrow="Point of sale"
-        title="Table map"
+        eyebrow={t("eyebrow")}
+        title={t("map.title")}
         actions={
           <div className="flex items-center gap-3 text-xs font-medium text-ink-soft">
-            {(Object.keys(STATUS_LABEL) as TableStatus[]).map((status) => (
+            {LEGEND_STATUSES.map((status) => (
               <span key={status} className="flex items-center gap-1.5">
                 <span className={`h-2 w-2 rounded-full ${STATUS_DOT[status]}`} />
-                {STATUS_LABEL[status]}
+                {tableStatusLabel(tCommon, status)}
               </span>
             ))}
           </div>
@@ -81,8 +82,8 @@ export default function TableMapPage() {
         ) : tables.length === 0 ? (
           <EmptyState
             icon={LayoutGrid}
-            title="No tables configured"
-            description="Tables set up for this branch will show up here as a floor map."
+            title={t("map.emptyTitle")}
+            description={t("map.emptyDescription")}
           />
         ) : (
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
@@ -93,7 +94,7 @@ export default function TableMapPage() {
                 className="flex min-h-24 flex-col items-start justify-center gap-2.5 rounded-xl border border-border bg-surface-raised p-5 text-start shadow-sm transition-all hover:-translate-y-0.5 hover:border-accent hover:shadow-md active:scale-[0.98] active:shadow-sm"
               >
                 <span className="text-lg font-semibold text-ink">{table.label}</span>
-                <StatusPill label={STATUS_LABEL[table.status]} tone={STATUS_TONE[table.status]} />
+                <StatusPill label={tableStatusLabel(tCommon, table.status)} tone={STATUS_TONE[table.status]} />
               </button>
             ))}
           </div>

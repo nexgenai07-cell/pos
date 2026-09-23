@@ -12,18 +12,19 @@ import Card from "@/components/ui/Card";
 import FormField from "@/components/ui/FormField";
 import Input from "@/components/ui/Input";
 import EmptyState from "@/components/ui/EmptyState";
+import { useTranslation } from "react-i18next";
+import { paymentMethodLabel } from "@/lib/i18n/labels";
+import { formatCurrency } from "@/lib/format";
 
-const METHODS: { value: PaymentMethod; label: string }[] = [
-  { value: "cash", label: "Cash" },
-  { value: "card", label: "Card" },
-  { value: "other", label: "Other" },
-];
+const METHODS: PaymentMethod[] = ["cash", "card", "other"];
 
 const CENTS_TOLERANCE = 0.01;
 
 export default function PaymentPage() {
   const { tableId = "" } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation("pos");
+  const { t: tCommon } = useTranslation("common");
 
   const [table, setTable] = useState<Table | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
@@ -49,13 +50,13 @@ export default function PaymentPage() {
     return Math.max(0, total - paid);
   }
 
-  if (!loaded) return <AdminShell><PageHeader eyebrow="Point of sale" title="Payment" /></AdminShell>;
+  if (!loaded) return <AdminShell><PageHeader eyebrow={t("eyebrow")} title={t("payment.title")} /></AdminShell>;
 
   if (!order) {
     return (
       <AdminShell>
-        <PageHeader eyebrow="Point of sale" title="Payment" />
-        <EmptyState icon={Receipt} title="No open order" description="This table doesn't have an order to charge for right now." />
+        <PageHeader eyebrow={t("eyebrow")} title={t("payment.title")} />
+        <EmptyState icon={Receipt} title={t("payment.emptyTitle")} description={t("payment.emptyDescription")} />
       </AdminShell>
     );
   }
@@ -95,10 +96,10 @@ export default function PaymentPage() {
       <AdminShell>
         <Card className="mx-auto max-w-md border-status-ready/30 bg-status-ready/5 text-center" padding="lg">
           <CheckCircle2 className="mx-auto mb-2 h-8 w-8 text-status-ready" strokeWidth={1.75} />
-          <p className="text-lg font-semibold text-status-ready">Payment recorded</p>
-          <p className="mt-1 text-sm text-ink-soft">{table?.label} is back to empty.</p>
+          <p className="text-lg font-semibold text-status-ready">{t("payment.doneTitle")}</p>
+          <p className="mt-1 text-sm text-ink-soft">{t("payment.doneBody", { table: table?.label ?? t("tableFallback") })}</p>
           <Button onClick={() => navigate("/pos")} className="mt-5">
-            Back to table map
+            {t("payment.backToMap")}
           </Button>
         </Card>
       </AdminShell>
@@ -107,43 +108,43 @@ export default function PaymentPage() {
 
   return (
     <AdminShell fitScreen>
-      <PageHeader eyebrow="Point of sale" title={`Payment — ${table?.label ?? "Table"}`} />
+      <PageHeader eyebrow={t("eyebrow")} title={t("payment.titleFor", { table: table?.label ?? t("tableFallback") })} />
 
       <div className="grid gap-5 lg:min-h-0 lg:flex-1 lg:grid-cols-[1fr_420px] lg:overflow-hidden">
         <section className="space-y-4 lg:min-h-0 lg:overflow-y-auto lg:pe-1">
           <Card>
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">Order items</p>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-soft">{t("payment.orderItems")}</p>
             {order.items.map((item) => (
               <div key={item.id} className="flex items-center justify-between py-1.5 text-sm text-ink-soft">
                 <span>
                   {item.quantity}× {item.nameSnapshot}
                 </span>
-                <span className="tabular-nums">${(item.priceSnapshot * item.quantity).toFixed(2)}</span>
+                <span className="tabular-nums">{formatCurrency(item.priceSnapshot * item.quantity)}</span>
               </div>
             ))}
             <div className="mt-2 flex items-center justify-between border-t border-border pt-2 text-sm font-semibold text-ink">
-              <span>Subtotal</span>
-              <span className="tabular-nums">${total.toFixed(2)}</span>
+              <span>{t("payment.subtotal")}</span>
+              <span className="tabular-nums">{formatCurrency(total)}</span>
             </div>
           </Card>
 
           {order.payments.length > 0 && (
             <Card className="border-accent/30 bg-accent-soft">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-accent">Split in progress</p>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-accent">{t("payment.splitInProgress")}</p>
               <div className="space-y-1 text-sm text-ink">
                 {order.payments.map((payment) => (
                   <div key={payment.id} className="flex items-center justify-between">
-                    <span className="capitalize">
-                      {payment.method}
-                      {payment.tip ? ` + $${payment.tip.toFixed(2)} tip` : ""}
+                    <span>
+                      {paymentMethodLabel(tCommon, payment.method)}
+                      {payment.tip ? ` ${t("payment.tipLine", { amount: formatCurrency(payment.tip) })}` : ""}
                     </span>
-                    <span className="tabular-nums">${payment.amount.toFixed(2)}</span>
+                    <span className="tabular-nums">{formatCurrency(payment.amount)}</span>
                   </div>
                 ))}
               </div>
               <div className="mt-2 flex items-center justify-between border-t border-accent/20 pt-2 text-sm font-semibold text-ink">
-                <span>Remaining</span>
-                <span className="tabular-nums">${remaining.toFixed(2)}</span>
+                <span>{t("payment.remaining")}</span>
+                <span className="tabular-nums">{formatCurrency(remaining)}</span>
               </div>
             </Card>
           )}
@@ -152,11 +153,14 @@ export default function PaymentPage() {
         <aside className="lg:min-h-0">
           <Card padding="none" className="flex h-fit flex-col lg:h-full">
             <h2 className="flex-none border-b border-border p-4 text-sm font-semibold uppercase tracking-wide text-ink-soft">
-              Charge
+              {t("payment.charge")}
             </h2>
 
             <div className="space-y-4 p-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-              <FormField label={`Amount to charge${order.payments.length > 0 ? " (split)" : ""}`} htmlFor="amount">
+              <FormField
+                label={order.payments.length > 0 ? t("payment.amountToChargeSplit") : t("payment.amountToCharge")}
+                htmlFor="amount"
+              >
                 <Input
                   id="amount"
                   type="number"
@@ -167,43 +171,45 @@ export default function PaymentPage() {
                   onChange={(event) => setAmount(event.target.value)}
                 />
                 {chargeAmount < remaining && (
-                  <p className="mt-1 text-xs text-ink-soft">${(remaining - chargeAmount).toFixed(2)} will remain owed after this payment.</p>
+                  <p className="mt-1 text-xs text-ink-soft">
+                    {t("payment.willRemain", { amount: formatCurrency(remaining - chargeAmount) })}
+                  </p>
                 )}
               </FormField>
 
               <div>
-                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-soft">Method</p>
+                <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-soft">{t("payment.method")}</p>
                 <div className="flex gap-2">
-                  {METHODS.map((option) => (
+                  {METHODS.map((value) => (
                     <button
-                      key={option.value}
-                      onClick={() => setMethod(option.value)}
+                      key={value}
+                      onClick={() => setMethod(value)}
                       className={`flex-1 rounded-lg border px-3 py-2.5 text-sm font-medium transition-all active:scale-[0.98] ${
-                        method === option.value ? "border-accent bg-accent text-white" : "border-border text-ink-soft hover:border-accent"
+                        method === value ? "border-accent bg-accent text-white" : "border-border text-ink-soft hover:border-accent"
                       }`}
                     >
-                      {option.label}
+                      {paymentMethodLabel(tCommon, value)}
                     </button>
                   ))}
                 </div>
               </div>
 
-              <FormField label="Tip" htmlFor="tip">
+              <FormField label={t("payment.tip")} htmlFor="tip">
                 <Input id="tip" type="number" min="0" step="0.5" value={tip} onChange={(event) => setTip(event.target.value)} />
               </FormField>
 
-              <FormField label="Phone (optional)" htmlFor="phone" hint="For repeat-customer tracking">
+              <FormField label={t("payment.phone")} htmlFor="phone" hint={t("payment.phoneHint")}>
                 <Input id="phone" type="tel" value={phone} onChange={(event) => setPhone(event.target.value)} />
               </FormField>
             </div>
 
             <div className="flex-none border-t border-border p-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-ink-soft">{paidSoFar > 0 ? "Charging now" : "Total charged"}</span>
-                <span className="text-xl font-semibold text-ink tabular-nums">${(chargeAmount + tipAmount).toFixed(2)}</span>
+                <span className="text-sm font-semibold text-ink-soft">{paidSoFar > 0 ? t("payment.chargingNow") : t("payment.totalCharged")}</span>
+                <span className="text-xl font-semibold text-ink tabular-nums">{formatCurrency(chargeAmount + tipAmount)}</span>
               </div>
               <Button onClick={handleConfirmPayment} disabled={chargeAmount <= 0} className="mt-4 w-full">
-                {chargeAmount < remaining ? "Charge & split remainder" : "Confirm payment"}
+                {chargeAmount < remaining ? t("payment.chargeSplit") : t("payment.confirmPayment")}
               </Button>
             </div>
           </Card>

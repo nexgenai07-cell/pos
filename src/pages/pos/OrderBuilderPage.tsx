@@ -16,15 +16,9 @@ import SearchInput from "@/components/ui/SearchInput";
 import EmptyState from "@/components/ui/EmptyState";
 import StatusPill from "@/components/ui/StatusPill";
 import { Skeleton } from "@/components/ui/Skeleton";
-
-const ITEM_STATUS_LABEL: Record<OrderItemStatus, string> = {
-  pending: "Not sent",
-  fired: "Fired",
-  preparing: "Preparing",
-  ready: "Ready",
-  served: "Served",
-  voided: "Voided",
-};
+import { useTranslation } from "react-i18next";
+import { badgeLabel, orderItemStatusLabel } from "@/lib/i18n/labels";
+import { formatCurrency } from "@/lib/format";
 
 const ITEM_STATUS_TONE: Record<OrderItemStatus, "neutral" | "warn" | "accent" | "good" | "danger"> = {
   pending: "neutral",
@@ -40,6 +34,8 @@ export default function OrderBuilderPage() {
   const { staff } = useAuth();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { t } = useTranslation("pos");
+  const { t: tCommon } = useTranslation("common");
 
   const [table, setTable] = useState<Table | null>(null);
   const [products, setProducts] = useState<ProductWithCategory[] | null>(null);
@@ -90,7 +86,7 @@ export default function OrderBuilderPage() {
     if (!order) return;
     await sendToKitchen(order.id);
     refreshOrder();
-    showToast("Sent to kitchen", "success");
+    showToast(t("toastSent"), "success");
   }
 
   const total = order ? getOrderTotal(order) : 0;
@@ -99,11 +95,11 @@ export default function OrderBuilderPage() {
   return (
     <AdminShell fitScreen>
       <PageHeader
-        eyebrow="Point of sale"
-        title={table ? table.label : "Table"}
+        eyebrow={t("eyebrow")}
+        title={table ? table.label : t("tableFallback")}
         actions={
           <Button variant="secondary" onClick={() => navigate(`/pos/table/${tableId}/payment`)}>
-            Go to payment
+            {t("goToPayment")}
           </Button>
         }
       />
@@ -120,11 +116,11 @@ export default function OrderBuilderPage() {
                     activeCategory === category ? "border-accent bg-accent text-white" : "border-border text-ink-soft hover:border-accent"
                   }`}
                 >
-                  {category}
+                  {category === "All" ? t("allCategory") : category}
                 </button>
               ))}
             </div>
-            <SearchInput value={search} onChange={setSearch} placeholder="Search menu…" className="sm:w-56" />
+            <SearchInput value={search} onChange={setSearch} placeholder={t("searchMenu")} className="sm:w-56" />
           </div>
 
           {products === null ? (
@@ -135,7 +131,7 @@ export default function OrderBuilderPage() {
             </div>
           ) : filteredProducts.length === 0 ? (
             <div className="mt-4">
-              <EmptyState icon={UtensilsCrossed} title="No items match" description="Try a different category or search term." />
+              <EmptyState icon={UtensilsCrossed} title={t("noMatchTitle")} description={t("noMatchDescription")} />
             </div>
           ) : (
             <div className="mt-4 grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:min-h-0 lg:flex-1 lg:auto-rows-min lg:overflow-y-auto lg:pb-1 lg:pe-1">
@@ -157,18 +153,18 @@ export default function OrderBuilderPage() {
                     />
                     {product.badge && (
                       <span className="absolute start-1.5 top-1.5 rounded-full bg-accent px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                        {product.badge}
+                        {badgeLabel(tCommon, product.badge)}
                       </span>
                     )}
                     {!product.isAvailable && (
                       <span className="absolute inset-0 flex items-center justify-center bg-surface-raised/80 text-[11px] font-semibold uppercase tracking-wide text-ink-soft">
-                        Unavailable
+                        {t("unavailable")}
                       </span>
                     )}
                   </div>
                   <div className="flex flex-1 flex-col gap-0.5 p-2.5">
                     <span className="truncate text-sm font-medium text-ink">{product.name}</span>
-                    <span className="text-xs font-semibold text-accent">${product.price.toFixed(2)}</span>
+                    <span className="text-xs font-semibold text-accent">{formatCurrency(product.price)}</span>
                   </div>
                 </button>
               ))}
@@ -179,7 +175,7 @@ export default function OrderBuilderPage() {
         <aside className="lg:min-h-0">
           <Card padding="none" className="flex h-fit flex-col lg:h-full">
             <h2 className="flex-none border-b border-border p-4 text-sm font-semibold uppercase tracking-wide text-ink-soft">
-              Ticket
+              {t("ticket")}
             </h2>
             <div className="divide-y divide-border p-4 lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
               {order?.items.length ? (
@@ -188,14 +184,18 @@ export default function OrderBuilderPage() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-ink">{item.nameSnapshot}</p>
                       <div className="mt-1 flex items-center gap-1.5">
-                        <span className="text-xs text-ink-soft">${item.priceSnapshot.toFixed(2)}</span>
-                        <StatusPill label={ITEM_STATUS_LABEL[item.status]} tone={ITEM_STATUS_TONE[item.status]} size="sm" />
+                        <span className="text-xs text-ink-soft">{formatCurrency(item.priceSnapshot)}</span>
+                        <StatusPill
+                          label={item.status === "pending" ? t("notSent") : orderItemStatusLabel(tCommon, item.status)}
+                          tone={ITEM_STATUS_TONE[item.status]}
+                          size="sm"
+                        />
                       </div>
                     </div>
                     <div className="flex flex-none items-center gap-1.5">
                       <button
                         onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                        aria-label={item.quantity === 1 ? "Remove item" : "Decrease quantity"}
+                        aria-label={item.quantity === 1 ? t("removeItem") : t("decreaseQuantity")}
                         className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-ink-soft transition-colors active:scale-95 hover:border-status-danger hover:text-status-danger"
                       >
                         {item.quantity === 1 ? (
@@ -207,7 +207,7 @@ export default function OrderBuilderPage() {
                       <span className="w-5 text-center text-xs font-semibold text-ink">{item.quantity}</span>
                       <button
                         onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                        aria-label="Increase quantity"
+                        aria-label={t("increaseQuantity")}
                         className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-ink-soft transition-colors active:scale-95 hover:border-accent hover:text-accent"
                       >
                         <Plus className="h-3.5 w-3.5" strokeWidth={2} />
@@ -216,17 +216,17 @@ export default function OrderBuilderPage() {
                   </div>
                 ))
               ) : (
-                <EmptyState icon={ClipboardList} title="Ticket is empty" description="Tap menu items to add them." />
+                <EmptyState icon={ClipboardList} title={t("ticketEmptyTitle")} description={t("ticketEmptyDescription")} />
               )}
             </div>
 
             <div className="flex-none border-t border-border p-4">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-ink-soft">Total</span>
-                <span className="text-lg font-semibold text-ink">${total.toFixed(2)}</span>
+                <span className="text-sm font-semibold text-ink-soft">{t("total")}</span>
+                <span className="text-lg font-semibold text-ink">{formatCurrency(total)}</span>
               </div>
               <Button onClick={handleSendToKitchen} disabled={!hasPendingItems} className="mt-4 w-full">
-                {hasPendingItems ? "Send to kitchen" : "Sent to kitchen ✓"}
+                {hasPendingItems ? t("sendToKitchen") : t("sentToKitchen")}
               </Button>
             </div>
           </Card>
